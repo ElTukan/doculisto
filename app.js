@@ -230,6 +230,7 @@
       demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } finally {
       window.clearInterval(stepTimer);
+      window.clearInterval(progressTimer);
       analyzeButton.disabled = false;
       analyzeButton.innerHTML = 'Analizar documento <span aria-hidden="true">→</span>';
     }

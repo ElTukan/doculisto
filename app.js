@@ -1,0 +1,69 @@
+(() => {
+  const fileInput = document.getElementById('fileInput');
+  const dropzone = document.getElementById('dropzone');
+  const fileState = document.getElementById('fileState');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  const removeFile = document.getElementById('removeFile');
+  const analyzeButton = document.getElementById('analyzeButton');
+  const demoResult = document.getElementById('demoResult');
+  const menuButton = document.querySelector('.menu-button');
+  const nav = document.querySelector('.nav');
+  const MAX_BYTES = 10 * 1024 * 1024;
+  const ALLOWED = new Set(['application/pdf','image/jpeg','image/png']);
+
+  function formatSize(bytes) {
+    if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function setFile(file) {
+    if (!file) return;
+    if (!ALLOWED.has(file.type)) { window.alert('Formato no compatible. Sube un PDF, JPG o PNG.'); return; }
+    if (file.size > MAX_BYTES) { window.alert('El archivo supera el límite de 10 MB.'); return; }
+    fileName.textContent = file.name;
+    fileSize.textContent = formatSize(file.size);
+    fileState.hidden = false;
+    dropzone.style.display = 'none';
+    analyzeButton.disabled = false;
+    demoResult.hidden = true;
+  }
+  function clearFile() {
+    fileInput.value = '';
+    fileState.hidden = true;
+    dropzone.style.display = 'flex';
+    analyzeButton.disabled = true;
+    demoResult.hidden = true;
+  }
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener('change', (event) => setFile(event.target.files?.[0]));
+
+  ['dragenter','dragover'].forEach((name) => dropzone.addEventListener(name, (event) => {
+    event.preventDefault(); dropzone.classList.add('dragging');
+  }));
+  ['dragleave','drop'].forEach((name) => dropzone.addEventListener(name, (event) => {
+    event.preventDefault(); dropzone.classList.remove('dragging');
+  }));
+  dropzone.addEventListener('drop', (event) => setFile(event.dataTransfer.files?.[0]));
+  removeFile.addEventListener('click', clearFile);
+
+  analyzeButton.addEventListener('click', () => {
+    if (analyzeButton.disabled) return;
+    demoResult.hidden = false;
+    demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  menuButton.addEventListener('click', () => {
+    const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!isOpen));
+    nav.style.display = isOpen ? '' : 'flex';
+    if (!isOpen) {
+      nav.style.position='absolute';nav.style.top='72px';nav.style.left='12px';nav.style.right='12px';nav.style.padding='14px';
+      nav.style.flexDirection='column';nav.style.alignItems='stretch';nav.style.gap='10px';nav.style.background='#fff';
+      nav.style.border='1px solid #e7e9ee';nav.style.borderRadius='16px';nav.style.boxShadow='0 20px 50px rgba(19,24,39,.10)';
+    }
+  });
+})();

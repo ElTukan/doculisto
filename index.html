@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="DocuListo te ayuda a entender documentos y saber qué hacer después." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://doculisto.es/" />
+  <title>DocuListo — Entiende tus documentos. Sabe qué hacer.</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebApplication",
+    "name":"DocuListo",
+    "url":"https://doculisto.es/",
+    "applicationCategory":"BusinessApplication",
+    "operatingSystem":"Web",
+    "description":"Herramienta para entender documentos y convertirlos en pasos claros."
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="DocuListo, inicio">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>Docu<span>Listo</span></span>
+    </a>
+    <nav class="nav" aria-label="Navegación principal">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#seguridad">Seguridad</a>
+      <a href="#faq">Preguntas frecuentes</a>
+      <a class="nav-button" href="#analizar">Analizar documento</a>
+    </nav>
+    <button class="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Hecho para documentos de España</div>
+        <h1>¿No entiendes<br /><span>un documento?</span></h1>
+        <p class="hero-text">
+          Súbelo y te ayudaremos a convertir la letra pequeña en información clara:
+          qué significa, qué tienes que hacer y qué fechas deberías revisar.
+        </p>
+        <div class="hero-points">
+          <span>✓ Explicación clara</span>
+          <span>✓ Pasos siguientes</span>
+          <span>✓ Fechas y plazos</span>
+        </div>
+      </div>
+
+      <div class="upload-card" id="analizar">
+        <div class="upload-card-top">
+          <div>
+            <p class="card-kicker">Primer paso</p>
+            <h2>Sube tu documento</h2>
+          </div>
+          <span class="lock-pill">Privado</span>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Seleccionar documento">
+          <input id="fileInput" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" hidden />
+          <div class="upload-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 16V4"></path>
+              <path d="m7 9 5-5 5 5"></path>
+              <path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path>
+            </svg>
+          </div>
+          <strong>Arrastra un archivo aquí</strong>
+          <span>o haz clic para seleccionarlo</span>
+          <small>PDF, JPG o PNG · máximo 10 MB</small>
+        </div>
+
+        <div class="file-state" id="fileState" hidden>
+          <div class="file-icon">DOC</div>
+          <div class="file-meta">
+            <strong id="fileName">documento.pdf</strong>
+            <span id="fileSize">0 MB</span>
+          </div>
+          <button type="button" class="remove-file" id="removeFile" aria-label="Quitar documento">×</button>
+        </div>
+
+        <button class="primary-button" id="analyzeButton" type="button" disabled>
+          Analizar documento <span aria-hidden="true">→</span>
+        </button>
+
+        <p class="privacy-note">◇ En esta primera versión, el archivo solo se prepara en tu navegador.</p>
+
+        <div class="demo-result" id="demoResult" hidden>
+          <div class="result-badge">Documento preparado</div>
+          <p>El analizador de IA se conectará en la siguiente fase. La interfaz ya está preparada para recibir el análisis.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip" id="seguridad">
+      <div><strong>01</strong><span>Claridad</span></div>
+      <div><strong>02</strong><span>Privacidad</span></div>
+      <div><strong>03</strong><span>Fuentes oficiales</span></div>
+      <div><strong>04</strong><span>Diseñado para España</span></div>
+    </section>
+
+    <section class="section" id="como-funciona">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">CÓMO FUNCIONA</p>
+          <h2>De un documento complicado a pasos claros.</h2>
+        </div>
+        <p>No queremos darte otro resumen interminable. Queremos ayudarte a saber qué hacer después.</p>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card"><span class="step-number">01</span><h3>Sube</h3><p>Elige un PDF o una foto del documento que quieres entender.</p></article>
+        <article class="step-card"><span class="step-number">02</span><h3>Entiende</h3><p>DocuListo convierte el contenido en una explicación sencilla y estructurada.</p></article>
+        <article class="step-card"><span class="step-number">03</span><h3>Actúa</h3><p>Consulta las acciones, fechas, documentos necesarios y próximos pasos.</p></article>
+      </div>
+    </section>
+
+    <section class="section muted-section">
+      <div class="section-heading compact">
+        <div>
+          <p class="section-label">PARA QUÉ SIRVE</p>
+          <h2>Diseñado para los documentos que más lío generan.</h2>
+        </div>
+      </div>
+      <div class="chips">
+        <span>Hacienda</span><span>SEPE</span><span>Seguridad Social</span><span>Contratos</span><span>Nóminas</span>
+        <span>Facturas</span><span>Multas</span><span>Alquileres</span><span>Ayudas</span><span>Administración</span>
+      </div>
+    </section>
+
+    <section class="callout">
+      <div><p class="section-label">LA IDEA</p><h2>Menos letra pequeña.<br />Más claridad.</h2></div>
+      <p>Cartas, contratos y notificaciones pueden ser difíciles de interpretar. DocuListo está pensado para transformar esa información en una guía práctica, con el contexto y las fuentes necesarias para que puedas comprobarlo.</p>
+    </section>
+
+    <section class="section faq-section" id="faq">
+      <div class="section-heading compact">
+        <div><p class="section-label">PREGUNTAS FRECUENTES</p><h2>Lo importante, sin rodeos.</h2></div>
+      </div>
+      <div class="faq">
+        <details><summary>¿Qué documentos podré subir?</summary><p>La primera versión está pensada para PDF, JPG y PNG. Más adelante podremos ampliar los formatos admitidos.</p></details>
+        <details><summary>¿DocuListo sustituye a un abogado o asesor?</summary><p>No. Su función será informativa y de orientación. En asuntos jurídicos o fiscales complejos habrá que recurrir a un profesional.</p></details>
+        <details><summary>¿Se guardan mis documentos?</summary><p>En esta versión inicial no se envían a ningún servidor. La gestión segura del almacenamiento se añadirá cuando conectemos el backend.</p></details>
+        <details><summary>¿Funcionará desde el móvil?</summary><p>Sí. La interfaz está diseñada desde el principio para funcionar en móvil, tablet y ordenador.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div><a class="brand" href="/" aria-label="DocuListo, inicio"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>Docu<span>Listo</span></span></a><p>Entiende tus documentos. Sabe qué hacer.</p></div>
+    <div class="footer-links"><a href="#seguridad">Privacidad</a><a href="#faq">FAQ</a><a href="mailto:hola@doculisto.es">Contacto</a></div>
+    <small>© 2026 DocuListo</small>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

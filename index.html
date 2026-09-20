@@ -104,6 +104,27 @@
         </button>
 
         <p class="privacy-note">◇ Versión de prueba: el documento se envía al analizador para generar el resultado. No subas documentos sensibles todavía.</p>
+        <div class="analysis-live" id="analysisLive" aria-live="polite" hidden>
+          <div class="live-visual" aria-hidden="true">
+            <div class="live-halo halo-a"></div>
+            <div class="live-halo halo-b"></div>
+            <div class="live-orbit live-orbit-a"></div>
+            <div class="live-orbit live-orbit-b"></div>
+            <div class="live-doc">
+              <span class="live-fold"></span>
+              <span class="live-line l1"></span>
+              <span class="live-line l2"></span>
+              <span class="live-line l3"></span>
+              <span class="live-scan"></span>
+            </div>
+            <span class="live-spark s1"></span><span class="live-spark s2"></span>
+            <span class="live-spark s3"></span><span class="live-spark s4"></span>
+          </div>
+          <div class="live-title">Analizando tu documento<span class="loading-dots"><i></i><i></i><i></i></span></div>
+          <div class="live-step" id="liveStep">Leyendo el documento</div>
+          <div class="live-progress"><span id="liveProgressFill"></span></div>
+          <div class="live-percent" id="livePercent">0%</div>
+        </div>
 
         <div class="demo-result" id="demoResult" hidden>
           <div class="result-badge">Documento preparado</div>

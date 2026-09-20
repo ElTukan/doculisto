@@ -9,6 +9,21 @@
   <link rel="canonical" href="https://doculisto.es/" />
   <title>DocuListo — Entiende tus documentos. Sabe qué hacer.</title>
   <link rel="stylesheet" href="./styles.css" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZC7K8J3BSVS"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      wait_for_update: 500
+    });
+    gtag('config', 'G-ZC7K8J3BSVS');
+  </script>
+
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -156,6 +171,16 @@
     <small>© 2026 DocuListo</small>
   </footer>
 
+  <aside class="consent-banner" id="consentBanner" aria-label="Preferencias de medición" hidden>
+    <div class="consent-copy">
+      <strong>Privacidad y medición</strong>
+      <p>Usamos Google Analytics para conocer cómo se utiliza DocuListo y mejorar la web. Puedes aceptar o rechazar la medición.</p>
+    </div>
+    <div class="consent-actions">
+      <button type="button" class="consent-secondary" id="rejectAnalytics">Rechazar</button>
+      <button type="button" class="consent-primary" id="acceptAnalytics">Aceptar</button>
+    </div>
+  </aside>
   <script src="./app.js"></script>
 </body>
 </html>

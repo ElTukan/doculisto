@@ -67,3 +67,34 @@
     }
   });
 })();
+
+  const consentBanner = document.getElementById('consentBanner');
+  const acceptAnalytics = document.getElementById('acceptAnalytics');
+  const rejectAnalytics = document.getElementById('rejectAnalytics');
+  const CONSENT_KEY = 'doculisto_analytics_consent';
+
+  function setAnalyticsConsent(value) {
+    try { localStorage.setItem(CONSENT_KEY, value); } catch (_) {}
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: value === 'granted' ? 'granted' : 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+    }
+    if (consentBanner) consentBanner.hidden = true;
+  }
+
+  if (consentBanner) {
+    let saved = null;
+    try { saved = localStorage.getItem(CONSENT_KEY); } catch (_) {}
+    if (saved === 'granted' || saved === 'denied') {
+      setAnalyticsConsent(saved);
+    } else {
+      setTimeout(() => { consentBanner.hidden = false; }, 350);
+    }
+  }
+
+  acceptAnalytics?.addEventListener('click', () => setAnalyticsConsent('granted'));
+  rejectAnalytics?.addEventListener('click', () => setAnalyticsConsent('denied'));

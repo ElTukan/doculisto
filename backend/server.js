@@ -48,46 +48,48 @@ app.post("/api/analyze", upload.single("document"), async (req, res) => {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     const prompt = `
-Eres el analizador de documentos de DocuListo para usuarios de España.
+Eres DocuListo, un asistente que ayuda a personas de España a entender documentos.
 
-Analiza el documento adjunto y responde en español claro, preciso y fácil de entender.
+Analiza el documento adjunto. NO hagas un resumen largo: transforma la información en una explicación práctica, clara y útil para la persona que lo ha recibido.
 
-OBJETIVO:
-No te limites a resumir. Ayuda al usuario a saber qué significa el documento y qué acciones debería revisar.
+Devuelve ÚNICAMENTE un objeto JSON válido. No uses Markdown, no uses bloques de código y no escribas texto fuera del JSON.
 
-Devuelve EXACTAMENTE estas secciones:
+Usa EXACTAMENTE esta estructura:
+{
+  "tipo": "Tipo de documento identificado",
+  "resumen": "Explicación de 1-3 frases sobre qué significa el documento para la persona.",
+  "acciones": [
+    "Acción concreta que el documento pide realizar"
+  ],
+  "plazos": [
+    {
+      "fecha": "Fecha o plazo tal y como aparece en el documento",
+      "contexto": "Qué significa esa fecha o plazo"
+    }
+  ],
+  "documentos": [
+    "Documento, dato o justificante solicitado explícitamente"
+  ],
+  "donde": "Dónde o cómo debe realizarse la acción, únicamente si aparece en el documento.",
+  "importante": [
+    "Advertencia, consecuencia o punto que la persona debería revisar"
+  ],
+  "fuente": "Qué información se ha extraído directamente del documento y qué aspectos no se pueden determinar."
+}
 
-QUE_ES:
-Una explicación breve de qué tipo de documento es y qué está comunicando.
-
-QUE_TENGO_QUE_HACER:
-Lista de acciones que el documento indica o que razonablemente se deben revisar. No inventes acciones.
-
-PLAZOS:
-Detecta todas las fechas y plazos que aparezcan. Si no aparece ninguno, indica "No se identifica ningún plazo en el documento".
-
-DOCUMENTACION:
-Enumera documentos, datos o justificantes que se soliciten explícitamente.
-
-DONDE:
-Indica el organismo, portal, dirección o canal que aparezca en el documento. No inventes enlaces.
-
-IMPORTANTE:
-Señala advertencias, consecuencias o puntos que el usuario debería revisar.
-
-FUENTE:
-Indica qué información proviene directamente del documento y qué puntos no pueden determinarse con él.
-
-REGLAS:
-- No inventes datos.
+REGLAS IMPORTANTES:
+- No inventes datos, fechas, requisitos, organismos, enlaces ni consecuencias.
+- Las acciones deben salir del documento. Si no se solicita ninguna acción clara, usa un array vacío.
+- Si no aparece un plazo, usa un array vacío.
+- Si no se solicita documentación, usa un array vacío.
+- Si no aparece un lugar o canal concreto, usa una cadena vacía.
+- Conserva literalmente fechas, cantidades y nombres relevantes.
+- No repitas números de identificación, direcciones completas u otros datos personales innecesarios.
+- Si el documento es una prueba o ejemplo, indícalo en "importante".
+- Si algo es ambiguo, dilo claramente en "fuente".
 - No des asesoramiento jurídico o fiscal como si fueras un profesional.
-- Si algo no se puede determinar, dilo claramente.
-- Conserva fechas, cantidades y nombres exactamente como aparezcan.
-- Si el documento parece ser una notificación oficial, indícalo.
-- No solicites ni repitas datos personales innecesarios.
-- Si detectas información especialmente sensible, evita reproducirla completa; describe su tipo.
-
-`.trim();
+- Prioriza precisión y claridad sobre cantidad de texto.
+`.trim();;
 
     const interaction = await ai.interactions.create({
       model: "gemini-3.8-flash",
@@ -102,6 +104,26 @@ REGLAS:
       ]
     });
 
+    const raw = String(interaction.output_text || "").trim();
+    let analysis = null;
+
+    try {
+      analysis = JSON.parse(raw);
+    } catch {
+      const cleaned = raw
+        .replace(/^\s*```json\s*/i, "")
+        .replace(/^\s*```\s*/i, "")
+        .replace(/\s*```\s*$/i, "")
+        .trim();
+      try {
+        analysis = JSON.parse(cleaned);
+      } catch {
+        return res.status(502).json({
+          error: "El analizador devolvió una respuesta no válida. Inténtalo de nuevo."
+        });
+      }
+    }
+
     return res.json({
       ok: true,
       file: {
@@ -109,7 +131,7 @@ REGLAS:
         mimeType: req.file.mimetype,
         size: req.file.size
       },
-      analysis: interaction.output_text
+      analysis
     });
   } catch (error) {
     console.error("DocuListo analyze error:", error);

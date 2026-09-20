@@ -53,3 +53,5 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 .consent-actions{display:flex;gap:8px;flex-shrink:0}.consent-primary,.consent-secondary{border-radius:11px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer}
 .consent-primary{border:0;background:var(--text);color:#fff}.consent-secondary{border:1px solid var(--line);background:#fff;color:var(--text)}
 @media(max-width:700px){.consent-banner{left:12px;right:12px;bottom:12px;align-items:stretch;flex-direction:column;gap:14px}.consent-actions{width:100%}.consent-primary,.consent-secondary{flex:1}}
+
+.analysis-output{margin:10px 0 0;white-space:pre-wrap;overflow:auto;font:inherit;font-size:13px;line-height:1.7;color:#596170;background:transparent}

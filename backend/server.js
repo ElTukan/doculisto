@@ -45,7 +45,7 @@ app.post("/api/analyze", upload.single("document"), async (req, res) => {
       });
     }
 
-    const ai = new GoogleGenAI({});
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
     const prompt = `
 Eres el analizador de documentos de DocuListo para usuarios de España.

@@ -109,22 +109,43 @@
     demoResult.hidden = false;
     demoResult.className = 'demo-result analysis-loading';
     demoResult.innerHTML = `
-      <div class="loading-orb" aria-hidden="true">
-        <span class="loading-document"></span>
-        <span class="loading-ring ring-one"></span>
-        <span class="loading-ring ring-two"></span>
+      <div class="loader-scene" aria-hidden="true">
+        <div class="loader-grid"></div>
+        <span class="ambient ambient-one"></span>
+        <span class="ambient ambient-two"></span>
+        <span class="ambient ambient-three"></span>
+        <div class="scan-orbit orbit-one"></div>
+        <div class="scan-orbit orbit-two"></div>
+        <div class="loader-document">
+          <span class="document-fold"></span>
+          <span class="document-line line-one"></span>
+          <span class="document-line line-two"></span>
+          <span class="document-line line-three"></span>
+          <span class="document-scan"></span>
+        </div>
+        <div class="loader-core"></div>
       </div>
       <div class="loading-copy">
         <div class="loading-title">Estamos analizando tu documento<span class="loading-dots"><i></i><i></i><i></i></span></div>
         <p class="loading-step" id="loadingStep">Leyendo el documento</p>
       </div>
-      <div class="loading-bar" aria-hidden="true"><span></span></div>`;
+      <div class="loading-progress-meta"><span>Procesando</span><strong id="loadingPercent">0%</strong></div>
+      <div class="loading-bar" aria-hidden="true"><span id="loadingBarFill"></span></div>`;
+    requestAnimationFrame(() => demoResult.classList.add('is-active'));
   }
 
   function showAnalysisResult(analysis) {
     demoResult.hidden = false;
     demoResult.className = 'demo-result analysis-success';
-    demoResult.innerHTML = '<div class="success-flare" aria-hidden="true"><span class="success-check">✓</span></div>' + renderAnalysis(analysis);
+    demoResult.innerHTML = `
+      <div class="success-scene" aria-hidden="true">
+        <span class="success-particle particle-one"></span><span class="success-particle particle-two"></span>
+        <span class="success-particle particle-three"></span><span class="success-particle particle-four"></span>
+        <span class="success-particle particle-five"></span><span class="success-particle particle-six"></span>
+        <span class="success-ring success-ring-one"></span><span class="success-ring success-ring-two"></span>
+        <span class="success-check">✓</span>
+      </div>
+      <div class="success-content">${renderAnalysis(analysis)}</div>`;
     requestAnimationFrame(() => demoResult.classList.add('is-visible'));
     demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -139,22 +160,45 @@
     showAnalyzingState();
 
     const loadingSteps = [
-      'Leyendo el documento',
-      'Identificando la información importante',
-      'Buscando fechas y acciones',
-      'Preparando una explicación clara'
+      { text:'Leyendo el documento', progress:18 },
+      { text:'Identificando la información importante', progress:42 },
+      { text:'Buscando fechas y acciones', progress:67 },
+      { text:'Preparando una explicación clara', progress:88 }
     ];
     let stepIndex = 0;
-    const stepTimer = window.setInterval(() => {
-      stepIndex = (stepIndex + 1) % loadingSteps.length;
+    let progress = 7;
+    let targetProgress = 18;
+
+    const updateLoader = () => {
       const step = document.getElementById('loadingStep');
+      const percent = document.getElementById('loadingPercent');
+      const fill = document.getElementById('loadingBarFill');
       if (step) {
         step.classList.remove('step-change');
         void step.offsetWidth;
-        step.textContent = loadingSteps[stepIndex];
+        step.textContent = loadingSteps[stepIndex].text;
         step.classList.add('step-change');
       }
-    }, 1500);
+      targetProgress = loadingSteps[stepIndex].progress;
+      if (percent) percent.textContent = Math.round(progress) + '%';
+      if (fill) fill.style.width = Math.round(progress) + '%';
+    };
+
+    updateLoader();
+    const progressTimer = window.setInterval(() => {
+      if (progress < targetProgress) progress += Math.max(.35, (targetProgress-progress)*.06);
+      const percent = document.getElementById('loadingPercent');
+      const fill = document.getElementById('loadingBarFill');
+      if (percent) percent.textContent = Math.round(progress) + '%';
+      if (fill) fill.style.width = Math.round(progress) + '%';
+    }, 90);
+
+    const stepTimer = window.setInterval(() => {
+      if (stepIndex < loadingSteps.length - 1) {
+        stepIndex += 1;
+        updateLoader();
+      }
+    }, 1550);
 
     try {
       const formData = new FormData();
@@ -169,6 +213,13 @@
       if (!response.ok) throw new Error(result.error || 'No se ha podido analizar el documento.');
 
       window.clearInterval(stepTimer);
+      window.clearInterval(progressTimer);
+      progress = 100;
+      const percent = document.getElementById('loadingPercent');
+      const fill = document.getElementById('loadingBarFill');
+      if (percent) percent.textContent = '100%';
+      if (fill) fill.style.width = '100%';
+      await new Promise(resolve => window.setTimeout(resolve, 260));
       showAnalysisResult(result.analysis);
     } catch (error) {
       window.clearInterval(stepTimer);

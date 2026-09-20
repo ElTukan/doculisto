@@ -105,14 +105,56 @@
       </div>`;
   }
 
+  function showAnalyzingState() {
+    demoResult.hidden = false;
+    demoResult.className = 'demo-result analysis-loading';
+    demoResult.innerHTML = `
+      <div class="loading-orb" aria-hidden="true">
+        <span class="loading-document"></span>
+        <span class="loading-ring ring-one"></span>
+        <span class="loading-ring ring-two"></span>
+      </div>
+      <div class="loading-copy">
+        <div class="loading-title">Estamos analizando tu documento<span class="loading-dots"><i></i><i></i><i></i></span></div>
+        <p class="loading-step" id="loadingStep">Leyendo el documento</p>
+      </div>
+      <div class="loading-bar" aria-hidden="true"><span></span></div>`;
+  }
+
+  function showAnalysisResult(analysis) {
+    demoResult.hidden = false;
+    demoResult.className = 'demo-result analysis-success';
+    demoResult.innerHTML = '<div class="success-flare" aria-hidden="true"><span class="success-check">✓</span></div>' + renderAnalysis(analysis);
+    requestAnimationFrame(() => demoResult.classList.add('is-visible'));
+    demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
   analyzeButton.addEventListener('click', async () => {
     if (analyzeButton.disabled) return;
     const file = fileInput.files?.[0];
     if (!file) return;
 
     analyzeButton.disabled = true;
-    analyzeButton.innerHTML = 'Analizando <span aria-hidden="true">…</span>';
-    demoResult.hidden = true;
+    analyzeButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Analizando';
+    showAnalyzingState();
+
+    const loadingSteps = [
+      'Leyendo el documento',
+      'Identificando la información importante',
+      'Buscando fechas y acciones',
+      'Preparando una explicación clara'
+    ];
+    let stepIndex = 0;
+    const stepTimer = window.setInterval(() => {
+      stepIndex = (stepIndex + 1) % loadingSteps.length;
+      const step = document.getElementById('loadingStep');
+      if (step) {
+        step.classList.remove('step-change');
+        void step.offsetWidth;
+        step.textContent = loadingSteps[stepIndex];
+        step.classList.add('step-change');
+      }
+    }, 1500);
 
     try {
       const formData = new FormData();
@@ -126,15 +168,17 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'No se ha podido analizar el documento.');
 
-      demoResult.hidden = false;
-      demoResult.innerHTML = renderAnalysis(result.analysis);
-      demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      window.clearInterval(stepTimer);
+      showAnalysisResult(result.analysis);
     } catch (error) {
+      window.clearInterval(stepTimer);
       demoResult.hidden = false;
+      demoResult.className = 'demo-result analysis-error';
       demoResult.innerHTML = '<div class="result-badge">No se ha podido analizar</div><p></p>';
       demoResult.querySelector('p').textContent = error?.message || 'Ha ocurrido un error. Inténtalo de nuevo.';
       demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } finally {
+      window.clearInterval(stepTimer);
       analyzeButton.disabled = false;
       analyzeButton.innerHTML = 'Analizar documento <span aria-hidden="true">→</span>';
     }

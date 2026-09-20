@@ -1,0 +1,11 @@
+{
+  "name": "doculisto",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@google/genai": "^1.20.0"
+  }
+}

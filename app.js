@@ -159,6 +159,8 @@
     analyzeButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Analizando';
     showAnalyzingState();
 
+    const loadingStartedAt = performance.now();
+    const MIN_LOADING_MS = 2400;
     const loadingSteps = [
       { text:'Leyendo el documento', progress:18 },
       { text:'Identificando la información importante', progress:42 },
@@ -219,7 +221,9 @@
       const fill = document.getElementById('loadingBarFill');
       if (percent) percent.textContent = '100%';
       if (fill) fill.style.width = '100%';
-      await new Promise(resolve => window.setTimeout(resolve, 260));
+      const elapsed = performance.now() - loadingStartedAt;
+      const remaining = Math.max(0, MIN_LOADING_MS - elapsed);
+      await new Promise(resolve => window.setTimeout(resolve, remaining + 220));
       showAnalysisResult(result.analysis);
     } catch (error) {
       window.clearInterval(stepTimer);

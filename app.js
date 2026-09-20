@@ -9,7 +9,7 @@
   const demoResult = document.getElementById('demoResult');
   const menuButton = document.querySelector('.menu-button');
   const nav = document.querySelector('.nav');
-  const MAX_BYTES = 10 * 1024 * 1024;
+  const MAX_BYTES = 3 * 1024 * 1024;
   const ALLOWED = new Set(['application/pdf','image/jpeg','image/png']);
 
   function formatSize(bytes) {
@@ -19,7 +19,7 @@
   function setFile(file) {
     if (!file) return;
     if (!ALLOWED.has(file.type)) { window.alert('Formato no compatible. Sube un PDF, JPG o PNG.'); return; }
-    if (file.size > MAX_BYTES) { window.alert('El archivo supera el límite de 10 MB.'); return; }
+    if (file.size > MAX_BYTES) { window.alert('El archivo supera el límite de 3 MB.'); return; }
     fileName.textContent = file.name;
     fileSize.textContent = formatSize(file.size);
     fileState.hidden = false;
@@ -50,10 +50,54 @@
   dropzone.addEventListener('drop', (event) => setFile(event.dataTransfer.files?.[0]));
   removeFile.addEventListener('click', clearFile);
 
-  analyzeButton.addEventListener('click', () => {
+  analyzeButton.addEventListener('click', async () => {
     if (analyzeButton.disabled) return;
-    demoResult.hidden = false;
-    demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    analyzeButton.disabled = true;
+    analyzeButton.innerHTML = 'Analizando <span aria-hidden="true">…</span>';
+    demoResult.hidden = true;
+
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("No se pudo leer el archivo."));
+        reader.readAsDataURL(file);
+      });
+
+      const base64 = String(dataUrl).split(",")[1];
+      const response = await fetch("https://api.doculisto.es/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          file: {
+            name: file.name,
+            mimeType: file.type,
+            size: file.size,
+            data: base64
+          }
+        })
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "No se ha podido analizar el documento.");
+
+      const output = result.analysis || "No se ha recibido ningún análisis.";
+      demoResult.hidden = false;
+      demoResult.innerHTML = '<div class="result-badge">Análisis completado</div><pre class="analysis-output"></pre>';
+      demoResult.querySelector('.analysis-output').textContent = output;
+      demoResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (error) {
+      demoResult.hidden = false;
+      demoResult.innerHTML = '<div class="result-badge">No se ha podido analizar</div><p></p>';
+      demoResult.querySelector("p").textContent = error?.message || "Ha ocurrido un error. Inténtalo de nuevo.";
+      demoResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } finally {
+      analyzeButton.disabled = false;
+      analyzeButton.innerHTML = 'Analizar documento <span aria-hidden="true">→</span>';
+    }
   });
 
   menuButton.addEventListener('click', () => {

@@ -35,11 +35,26 @@
     demoResult.hidden = true;
   }
 
-  dropzone.addEventListener('click', () => fileInput.click());
+  // The upload area is a label linked to the hidden input. Keep keyboard support without
+  // triggering a second click, which can open the picker twice in some browsers.
   dropzone.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      fileInput.focus();
+      fileInput.click();
+    }
   });
-  fileInput.addEventListener('change', (event) => setFile(event.target.files?.[0]));
+  fileInput.addEventListener('change', (event) => {
+    const file = event.target.files?.[0];
+    if (file) setFile(file);
+  });
+
+  // Native file-picker errors should not leave the UI in an unusable state.
+  fileInput.addEventListener('cancel', () => {
+    if (!fileInput.files?.length) {
+      analyzeButton.disabled = true;
+    }
+  });
 
   ['dragenter','dragover'].forEach((name) => dropzone.addEventListener(name, (event) => {
     event.preventDefault(); dropzone.classList.add('dragging');

@@ -106,35 +106,26 @@
   }
 
   function showAnalyzingState() {
-    demoResult.hidden = false;
-    demoResult.className = 'demo-result analysis-loading';
-    demoResult.innerHTML = `
-      <div class="loader-scene" aria-hidden="true">
-        <div class="loader-grid"></div>
-        <span class="ambient ambient-one"></span>
-        <span class="ambient ambient-two"></span>
-        <span class="ambient ambient-three"></span>
-        <div class="scan-orbit orbit-one"></div>
-        <div class="scan-orbit orbit-two"></div>
-        <div class="loader-document">
-          <span class="document-fold"></span>
-          <span class="document-line line-one"></span>
-          <span class="document-line line-two"></span>
-          <span class="document-line line-three"></span>
-          <span class="document-scan"></span>
-        </div>
-        <div class="loader-core"></div>
-      </div>
-      <div class="loading-copy">
-        <div class="loading-title">Estamos analizando tu documento<span class="loading-dots"><i></i><i></i><i></i></span></div>
-        <p class="loading-step" id="loadingStep">Leyendo el documento</p>
-      </div>
-      <div class="loading-progress-meta"><span>Procesando</span><strong id="loadingPercent">0%</strong></div>
-      <div class="loading-bar" aria-hidden="true"><span id="loadingBarFill"></span></div>`;
-    requestAnimationFrame(() => demoResult.classList.add('is-active'));
+    const live = document.getElementById('analysisLive');
+    const result = document.getElementById('demoResult');
+    if (result) result.hidden = true;
+    if (!live) return;
+    live.hidden = false;
+    live.classList.remove('live-visible');
+    requestAnimationFrame(() => live.classList.add('live-visible'));
+    const fill = document.getElementById('liveProgressFill');
+    const percent = document.getElementById('livePercent');
+    if (fill) fill.style.width = '6%';
+    if (percent) percent.textContent = '6%';
   }
 
+
   function showAnalysisResult(analysis) {
+    const live = document.getElementById('analysisLive');
+    if (live) {
+      live.classList.remove('live-visible');
+      window.setTimeout(() => { live.hidden = true; }, 260);
+    }
     demoResult.hidden = false;
     demoResult.className = 'demo-result analysis-success';
     demoResult.innerHTML = `
@@ -181,9 +172,24 @@
         step.textContent = loadingSteps[stepIndex].text;
         step.classList.add('step-change');
       }
+      const liveStep = document.getElementById('liveStep');
+      if (liveStep) {
+        liveStep.classList.remove('step-change');
+        void liveStep.offsetWidth;
+        liveStep.textContent = loadingSteps[stepIndex].text;
+        liveStep.classList.add('step-change');
+      }
       targetProgress = loadingSteps[stepIndex].progress;
       if (percent) percent.textContent = Math.round(progress) + '%';
       if (fill) fill.style.width = Math.round(progress) + '%';
+      const livePercent = document.getElementById('livePercent');
+      const liveFill = document.getElementById('liveProgressFill');
+      if (livePercent) livePercent.textContent = Math.round(progress) + '%';
+      if (liveFill) liveFill.style.width = Math.round(progress) + '%';
+      const livePercent = document.getElementById('livePercent');
+      const liveFill = document.getElementById('liveProgressFill');
+      if (livePercent) livePercent.textContent = Math.round(progress) + '%';
+      if (liveFill) liveFill.style.width = Math.round(progress) + '%';
     };
 
     updateLoader();

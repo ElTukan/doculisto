@@ -50,6 +50,61 @@
   dropzone.addEventListener('drop', (event) => setFile(event.dataTransfer.files?.[0]));
   removeFile.addEventListener('click', clearFile);
 
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function listHtml(items, renderItem) {
+    if (!Array.isArray(items) || items.length === 0) return '';
+    return '<ul class="analysis-list">' + items.map(renderItem).join('') + '</ul>';
+  }
+
+  function renderAnalysis(analysis) {
+    const a = analysis || {};
+    const actions = listHtml(a.acciones, item => '<li>' + escapeHtml(item) + '</li>');
+    const docs = listHtml(a.documentos, item => '<li>' + escapeHtml(item) + '</li>');
+    const important = listHtml(a.importante, item => '<li>' + escapeHtml(item) + '</li>');
+    const deadlines = Array.isArray(a.plazos) && a.plazos.length
+      ? '<div class="deadline-list">' + a.plazos.map(p =>
+          '<div class="deadline-item"><strong>' + escapeHtml(p.fecha) + '</strong><span>' + escapeHtml(p.contexto) + '</span></div>'
+        ).join('') + '</div>'
+      : '<p class="analysis-muted">No se identifica un plazo en el documento.</p>';
+
+    return `
+      <div class="analysis-header">
+        <div class="result-badge">Análisis completado</div>
+        <h3>${escapeHtml(a.tipo || 'Documento analizado')}</h3>
+        <p>${escapeHtml(a.resumen || 'No se ha podido obtener un resumen claro.')}</p>
+      </div>
+      <div class="analysis-section">
+        <span class="analysis-label">QUÉ TIENES QUE HACER</span>
+        ${actions || '<p class="analysis-muted">No se identifica ninguna acción concreta en el documento.</p>'}
+      </div>
+      <div class="analysis-section">
+        <span class="analysis-label">PLAZOS</span>
+        ${deadlines}
+      </div>
+      <div class="analysis-section">
+        <span class="analysis-label">QUÉ NECESITAS</span>
+        ${docs || '<p class="analysis-muted">No se indica documentación adicional.</p>'}
+      </div>
+      <div class="analysis-section">
+        <span class="analysis-label">DÓNDE</span>
+        <p>${escapeHtml(a.donde || 'El documento no indica un lugar o canal concreto.')}</p>
+      </div>
+      <div class="analysis-section">
+        <span class="analysis-label">IMPORTANTE</span>
+        ${important || '<p class="analysis-muted">No se ha identificado ninguna advertencia específica.</p>'}
+      </div>
+      <div class="analysis-source">
+        <span>Fuente y límites</span>
+        <p>${escapeHtml(a.fuente || '')}</p>
+      </div>`;
+  }
+
   analyzeButton.addEventListener('click', async () => {
     if (analyzeButton.disabled) return;
     const file = fileInput.files?.[0];
@@ -69,13 +124,10 @@
       });
 
       const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result.error || 'No se ha podido analizar el documento.');
-      }
+      if (!response.ok) throw new Error(result.error || 'No se ha podido analizar el documento.');
 
       demoResult.hidden = false;
-      demoResult.innerHTML = '<div class="result-badge">Análisis completado</div><pre class="analysis-output"></pre>';
-      demoResult.querySelector('.analysis-output').textContent = result.analysis || 'No se ha recibido ningún análisis.';
+      demoResult.innerHTML = renderAnalysis(result.analysis);
       demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (error) {
       demoResult.hidden = false;

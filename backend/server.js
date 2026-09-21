@@ -3,6 +3,9 @@ import cors from "cors";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 
+const PRIMARY_MODEL = "gemini-2.5-flash-lite";
+const FALLBACK_MODEL = "gemini-2.5-flash";
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -107,7 +110,7 @@ app.get("/api/diagnostic", async (_req, res) => {
     });
 
     const model = await ai.models.get({
-      model: "gemini-3.1-flash-lite"
+      model: PRIMARY_MODEL
     });
 
     return res.json({
@@ -233,24 +236,57 @@ app.post(
         apiKey: process.env.GEMINI_API_KEY
       });
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
-        contents: [
-          {
-            text: ANALYSIS_PROMPT
-          },
-          {
-            inlineData: {
-              mimeType: req.file.mimetype,
-              data: req.file.buffer.toString("base64")
-            }
+      const contents = [
+        {
+          text: ANALYSIS_PROMPT
+        },
+        {
+          inlineData: {
+            mimeType: req.file.mimetype,
+            data: req.file.buffer.toString("base64")
           }
-        ],
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: ANALYSIS_SCHEMA
         }
-      });
+      ];
+
+      const config = {
+        responseMimeType: "application/json",
+        responseSchema: ANALYSIS_SCHEMA
+      };
+
+      let response;
+      let lastError;
+
+      for (const model of [PRIMARY_MODEL, FALLBACK_MODEL]) {
+        try {
+          response = await ai.models.generateContent({
+            model,
+            contents,
+            config
+          });
+          lastError = null;
+          console.log(`DocuListo analysis completed with ${model}`);
+          break;
+        } catch (error) {
+          lastError = error;
+          const status = Number(error?.status || error?.code || 0);
+          const message = String(error?.message || "").toLowerCase();
+
+          const retryable =
+            status === 429 ||
+            status === 503 ||
+            /quota|resource exhausted|rate limit|too many requests|high demand|unavailable/.test(message);
+
+          if (!retryable || model === FALLBACK_MODEL) {
+            throw error;
+          }
+
+          console.warn(`Model ${model} unavailable; trying ${FALLBACK_MODEL}`);
+        }
+      }
+
+      if (!response) {
+        throw lastError || new Error("No se recibió respuesta del proveedor de IA.");
+      }
 
       const raw = String(response.text || "").trim();
 

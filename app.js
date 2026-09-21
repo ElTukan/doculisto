@@ -342,8 +342,15 @@
     window.gtag('config', 'G-ZC7K8J3BSVS', {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      send_page_view: true,
-      transport_type: 'beacon'
+      send_page_view: false
+    });
+
+    window.gtag('event', 'page_view', {
+      send_to: 'G-ZC7K8J3BSVS',
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname,
+      debug_mode: true
     });
 
     window.__doculistoAnalyticsStarted = true;

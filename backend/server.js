@@ -107,7 +107,7 @@ app.get("/api/diagnostic", async (_req, res) => {
     });
 
     const model = await ai.models.get({
-      model: "gemini-3.8-flash"
+      model: "gemini-3.1-flash-lite"
     });
 
     return res.json({
@@ -234,7 +234,7 @@ app.post(
       });
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
+        model: "gemini-3.1-flash-lite",
         contents: [
           {
             text: ANALYSIS_PROMPT

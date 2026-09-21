@@ -153,3 +153,7 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 @keyframes liveDocFloat{0%,100%{transform:translateY(2px) rotate(0)}50%{transform:translateY(-8px) rotate(-1.2deg)}}@keyframes liveScan{0%,100%{top:8px;opacity:.22}50%{top:63px;opacity:1}}@keyframes liveOrbit{to{transform:rotate(360deg)}}@keyframes liveOrbitReverse{to{transform:rotate(-360deg)}}@keyframes liveHalo{0%,100%{transform:scale(.82);opacity:.35}50%{transform:scale(1.05);opacity:.75}}@keyframes liveSpark{0%,100%{transform:translateY(0) scale(.8);opacity:.2}50%{transform:translateY(-9px) scale(1.2);opacity:.65}}@keyframes liveStepFloat{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(-2px);opacity:1}}@keyframes liveBarGlow{to{background-position:-180% 0}}
 @media(max-width:560px){.analysis-live{min-height:245px}.live-visual{height:130px}}
 @media(prefers-reduced-motion:reduce){.analysis-live *{animation:none!important;transition:none!important}}
+
+.dropzone{position:relative;overflow:hidden}
+.file-input-overlay{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:6}
+.dropzone>*:not(.file-input-overlay){pointer-events:none}

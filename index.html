@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="es">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZTCN2SMVB7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
+    gtag('config', 'G-ZTCN2SMVB7', { send_page_view: false });
+  </script>
 <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ffffff" />
@@ -183,5 +197,6 @@
     <small>© 2026 DocuListo</small>
   </footer>
 <script src="./app.js?v=20260921-analytics-clean"></script>
+  <script src="./consent.js"></script>
 </body>
 </html>

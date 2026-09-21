@@ -3,8 +3,8 @@ import cors from "cors";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 
-const PRIMARY_MODEL = "gemini-2.5-flash-lite";
-const FALLBACK_MODEL = "gemini-2.5-flash";
+const PRIMARY_MODEL = "gemini-3.5-flash-lite";
+const FALLBACK_MODEL = "gemini-3.5-flash";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -236,39 +236,44 @@ app.post(
         apiKey: process.env.GEMINI_API_KEY
       });
 
-      const contents = [
+      const encodedDocument = req.file.buffer.toString("base64");
+      const input = [
         {
+          type: "text",
           text: ANALYSIS_PROMPT
         },
         {
-          inlineData: {
-            mimeType: req.file.mimetype,
-            data: req.file.buffer.toString("base64")
-          }
+          type: "document",
+          data: encodedDocument,
+          mime_type: req.file.mimetype
         }
       ];
 
-      const config = {
-        responseMimeType: "application/json",
-        responseSchema: ANALYSIS_SCHEMA
+      const responseFormat = {
+        type: "text",
+        mime_type: "application/json",
+        schema: ANALYSIS_SCHEMA
       };
 
-      let response;
+      let interaction;
       let lastError;
 
       for (const model of [PRIMARY_MODEL, FALLBACK_MODEL]) {
         try {
-          response = await ai.models.generateContent({
+          interaction = await ai.interactions.create({
             model,
-            contents,
-            config
+            store: false,
+            input,
+            response_format: responseFormat
           });
+
           lastError = null;
           console.log(`DocuListo analysis completed with ${model}`);
           break;
         } catch (error) {
           lastError = error;
-          const status = Number(error?.status || error?.code || 0);
+
+          const status = Number(error?.status || error?.statusCode || error?.code || 0);
           const message = String(error?.message || "").toLowerCase();
 
           const retryable =
@@ -284,11 +289,11 @@ app.post(
         }
       }
 
-      if (!response) {
+      if (!interaction) {
         throw lastError || new Error("No se recibió respuesta del proveedor de IA.");
       }
 
-      const raw = String(response.text || "").trim();
+      const raw = String(interaction.output_text || "").trim();
 
       if (!raw) {
         return res.status(502).json({

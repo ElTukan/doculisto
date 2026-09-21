@@ -13,7 +13,13 @@
       ad_personalization: 'denied'
     });
     const tagAssistantDebug = new URLSearchParams(window.location.search).has('gtm_debug');
-    gtag('config', 'G-ZC7K8J3BSVS', { send_page_view: false });
+    const initialConfig = {
+      send_page_view: false,
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
+    };
+    if (tagAssistantDebug) initialConfig.debug_mode = true;
+    gtag('config', 'G-ZC7K8J3BSVS', initialConfig);
   </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -326,10 +326,12 @@
   const CONSENT_KEY = 'doculisto_analytics_consent';
 
   function loadAnalytics() {
-    if (typeof window.gtag !== 'function') {
-      window.setTimeout(loadAnalytics, 250);
+    if (window.__doculistoAnalyticsStarted) return;
+    if (!window.__doculistoGtagLoaded) {
+      window.setTimeout(loadAnalytics, 200);
       return;
     }
+
     window.gtag('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
@@ -337,27 +339,14 @@
       ad_personalization: 'denied'
     });
 
-    const isTagAssistantSession = new URLSearchParams(window.location.search).has('gtm_debug');
-    const config = {
+    window.gtag('config', 'G-ZC7K8J3BSVS', {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      send_page_view: false
-    };
-    if (isTagAssistantSession) config.debug_mode = true;
-    window.gtag('config', 'G-ZC7K8J3BSVS', config);
-    const pageView = {
-      page_title: document.title,
-      page_location: window.location.href,
-      page_path: window.location.pathname
-    };
-    if (isTagAssistantSession) pageView.debug_mode = true;
-    window.gtag('event', 'page_view', pageView);
-    if (isTagAssistantSession) {
-      window.gtag('event', 'doculisto_tag_test', {
-        debug_mode: true,
-        page_location: window.location.href
-      });
-    }
+      send_page_view: true,
+      transport_type: 'beacon'
+    });
+
+    window.__doculistoAnalyticsStarted = true;
   }
 
   function setAnalyticsConsent(value) {

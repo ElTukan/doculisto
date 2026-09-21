@@ -336,11 +336,16 @@
       ad_user_data: 'denied',
       ad_personalization: 'denied'
     });
-    window.gtag('config', 'G-ZC7K8J3BSVS', {
+
+    const config = {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
       send_page_view: true
-    });
+    };
+    if (new URLSearchParams(window.location.search).has('gtm_debug')) {
+      config.debug_mode = true;
+    }
+    window.gtag('config', 'G-ZC7K8J3BSVS', config);
   }
 
   function setAnalyticsConsent(value) {

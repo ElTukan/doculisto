@@ -74,14 +74,38 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "doculisto-api" });
 });
 
-app.get("/api/diagnostic", (_req, res) => {
+app.get("/api/diagnostic", async (_req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({
-    ok: true,
-    service: "doculisto-api",
-    analyze: true,
-    geminiConfigured: Boolean(process.env.GEMINI_API_KEY)
-  });
+
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({
+      ok: false,
+      service: "doculisto-api",
+      geminiConfigured: false
+    });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const model = await ai.models.get({ model: "gemini-3.8-flash" });
+
+    return res.json({
+      ok: true,
+      service: "doculisto-api",
+      analyze: true,
+      geminiConfigured: true,
+      modelAvailable: Boolean(model?.name)
+    });
+  } catch (error) {
+    console.error("DocuListo diagnostic error:", error);
+    return res.status(503).json({
+      ok: false,
+      service: "doculisto-api",
+      analyze: false,
+      geminiConfigured: true,
+      modelAvailable: false
+    });
+  }
 });
 
 app.post("/api/analyze", rateLimitAnalysis, upload.single("document"), async (req, res) => {
@@ -145,37 +169,104 @@ REGLAS IMPORTANTES:
 - Prioriza precisión y claridad sobre cantidad de texto.
 `.trim();;
 
-    const interaction = await ai.interactions.create({
+    const prompt = `
+Eres DocuListo, un asistente que ayuda a personas de España a entender documentos.
+
+Analiza el documento adjunto. NO hagas un resumen largo: transforma la información en una explicación práctica, clara y útil para la persona que lo ha recibido.
+
+Devuelve únicamente la información que esté respaldada por el documento.
+
+REGLAS IMPORTANTES:
+- No inventes datos, fechas, requisitos, organismos, enlaces ni consecuencias.
+- Las acciones deben salir del documento. Si no se solicita ninguna acción clara, devuelve un array vacío.
+- Si no aparece un plazo, devuelve un array vacío.
+- Si no se solicita documentación, devuelve un array vacío.
+- Si no aparece un lugar o canal concreto, devuelve una cadena vacía.
+- Conserva literalmente fechas, cantidades y nombres relevantes.
+- No repitas números de identificación, direcciones completas u otros datos personales innecesarios.
+- Si el documento es una prueba o ejemplo, indícalo en "importante".
+- Si algo es ambiguo, dilo claramente en "fuente".
+- No des asesoramiento jurídico o fiscal como si fueras un profesional.
+- Prioriza precisión y claridad sobre cantidad de texto.
+`.trim();
+
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const documentData = req.file.buffer.toString("base64");
+
+    const response = await ai.models.generateContent({
       model: "gemini-3.8-flash",
-      store: false,
-      input: [
-        { type: "text", text: prompt },
+      contents: [
         {
-          type: "document",
-          data: req.file.buffer.toString("base64"),
-          mime_type: req.file.mimetype
+          text: prompt
+        },
+        {
+          inlineData: {
+            mimeType: req.file.mimetype,
+            data: documentData
+          }
         }
-      ]
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            tipo: { type: "string" },
+            resumen: { type: "string" },
+            acciones: {
+              type: "array",
+              items: { type: "string" }
+            },
+            plazos: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  fecha: { type: "string" },
+                  contexto: { type: "string" }
+                },
+                required: ["fecha", "contexto"]
+              }
+            },
+            documentos: {
+              type: "array",
+              items: { type: "string" }
+            },
+            donde: { type: "string" },
+            importante: {
+              type: "array",
+              items: { type: "string" }
+            },
+            fuente: { type: "string" }
+          },
+          required: [
+            "tipo",
+            "resumen",
+            "acciones",
+            "plazos",
+            "documentos",
+            "donde",
+            "importante",
+            "fuente"
+          ]
+        }
+      }
     });
 
-    const raw = String(interaction.output_text || "").trim();
-    let analysis = null;
+    const raw = String(response.text || "").trim();
+    if (!raw) {
+      return res.status(502).json({
+        error: "El proveedor de IA no ha devuelto ningún resultado."
+      });
+    }
 
+    let analysis;
     try {
       analysis = JSON.parse(raw);
     } catch {
-      const cleaned = raw
-        .replace(/^\s*```json\s*/i, "")
-        .replace(/^\s*```\s*/i, "")
-        .replace(/\s*```\s*$/i, "")
-        .trim();
-      try {
-        analysis = JSON.parse(cleaned);
-      } catch {
-        return res.status(502).json({
-          error: "El analizador devolvió una respuesta no válida. Inténtalo de nuevo."
-        });
-      }
+      return res.status(502).json({
+        error: "El proveedor de IA ha devuelto una respuesta no válida. Inténtalo de nuevo."
+      });
     }
 
     return res.json({
@@ -189,8 +280,30 @@ REGLAS IMPORTANTES:
     });
   } catch (error) {
     console.error("DocuListo analyze error:", error);
-    return res.status(500).json({
-      error: "No hemos podido analizar el documento. Inténtalo de nuevo."
+
+    const message = String(error?.message || "").toLowerCase();
+    const status = Number(error?.status || error?.code || 0);
+
+    if (status === 429 || /quota|resource exhausted|rate limit|too many requests/.test(message)) {
+      return res.status(503).json({
+        error: "El servicio de IA ha alcanzado temporalmente su límite de uso. Vuelve a intentarlo en unos minutos."
+      });
+    }
+
+    if (status === 401 || status === 403 || /api key|permission|unauthorized|forbidden/.test(message)) {
+      return res.status(503).json({
+        error: "El servicio de IA no está autorizado correctamente."
+      });
+    }
+
+    if (status === 400 || /invalid argument|bad request|unsupported/.test(message)) {
+      return res.status(400).json({
+        error: "El proveedor de IA ha rechazado este documento o su formato."
+      });
+    }
+
+    return res.status(502).json({
+      error: "El servicio de IA no ha podido procesar el documento en este momento."
     });
   }
 });

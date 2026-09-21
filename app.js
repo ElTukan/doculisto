@@ -13,7 +13,7 @@
   const nav = document.querySelector('.nav');
   const MAX_BYTES = 10 * 1024 * 1024;
   const ALLOWED = new Set(['application/pdf','image/jpeg','image/png']);
-  const API_BASE = 'https://api.doculisto.es';
+  const API_BASE = 'https://doculisto-api.onrender.com';
   const API_WARMUP_TIMEOUT_MS = 75000;
   const API_ANALYSIS_TIMEOUT_MS = 90000;
   let apiWarmupPromise = null;

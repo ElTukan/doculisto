@@ -6,6 +6,24 @@ import { GoogleGenAI } from "@google/genai";
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+
+const RATE_WINDOW_MS = 15 * 60 * 1000;
+const RATE_MAX = 12;
+const rateBuckets = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const current = rateBuckets.get(ip);
+  if (!current || now - current.startedAt >= RATE_WINDOW_MS) {
+    rateBuckets.set(ip, { startedAt: now, count: 1 });
+    return false;
+  }
+  current.count += 1;
+  return current.count > RATE_MAX;
+}
+
 const allowedOrigins = new Set([
   "https://doculisto.es",
   "https://www.doculisto.es"
@@ -28,11 +46,21 @@ const upload = multer({
 });
 
 app.get("/health", (_req, res) => {
+  res.set("Cache-Control", "no-store");
   res.json({ ok: true, service: "doculisto-api" });
 });
 
 app.post("/api/analyze", upload.single("document"), async (req, res) => {
   try {
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    if (isRateLimited(ip)) {
+      res.set("Retry-After", "900");
+      return res.status(429).json({
+        error: "Has alcanzado el límite temporal de análisis. Espera unos minutos y vuelve a intentarlo."
+      });
+    }
+
+    res.set("Cache-Control", "no-store");
     if (!req.file) {
       return res.status(400).json({
         error: "Debes subir un PDF, JPG o PNG."
@@ -157,6 +185,12 @@ app.use((err, _req, res, _next) => {
     });
   }
   return res.status(500).json({ error: "Error interno." });
+});
+
+app.use((_req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("Referrer-Policy", "no-referrer");
+  next();
 });
 
 app.listen(port, () => {

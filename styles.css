@@ -157,3 +157,12 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 
 .select-file-button{margin-top:14px;border:1px solid #dfe1e7;background:#fff;color:#252a31;border-radius:11px;padding:9px 13px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s;position:relative;z-index:2}
 .select-file-button:hover{border-color:#bdb9ff;background:#f8f8ff;transform:translateY(-1px)}
+
+/* Analysis result v2 */
+.analysis-quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.quick-card{min-height:90px;padding:14px;border:1px solid #e5e4f2;border-radius:14px;background:#fafaff}
+.quick-card span{display:block;font-size:9px;letter-spacing:.12em;font-weight:900;color:#8b879e;margin-bottom:7px}
+.quick-card strong{display:block;font-size:12px;line-height:1.55;color:#2c313a}
+.analysis-error{background:#fff8f7;border-color:#f1ddda}
+.legal-page{max-width:880px}.legal-page h1{margin:0 0 18px;font-size:clamp(40px,6vw,64px);line-height:1.02;letter-spacing:-.06em}.legal-lead{max-width:720px;color:var(--muted);font-size:17px;margin:0 0 38px}.legal-page .faq{margin-top:0}
+@media(max-width:560px){.analysis-quick{grid-template-columns:1fr}}

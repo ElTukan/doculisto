@@ -30,6 +30,17 @@ function isRateLimited(ip) {
   return current.count > RATE_MAX;
 }
 
+function rateLimitAnalysis(req, res, next) {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  if (isRateLimited(ip)) {
+    res.set("Retry-After", "900");
+    return res.status(429).json({
+      error: "Has alcanzado el límite temporal de análisis. Espera unos minutos y vuelve a intentarlo."
+    });
+  }
+  next();
+}
+
 const allowedOrigins = new Set([
   "https://doculisto.es",
   "https://www.doculisto.es"
@@ -56,16 +67,8 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "doculisto-api" });
 });
 
-app.post("/api/analyze", upload.single("document"), async (req, res) => {
+app.post("/api/analyze", rateLimitAnalysis, upload.single("document"), async (req, res) => {
   try {
-    const ip = req.ip || req.socket.remoteAddress || "unknown";
-    if (isRateLimited(ip)) {
-      res.set("Retry-After", "900");
-      return res.status(429).json({
-        error: "Has alcanzado el límite temporal de análisis. Espera unos minutos y vuelve a intentarlo."
-      });
-    }
-
     res.set("Cache-Control", "no-store");
     if (!req.file) {
       return res.status(400).json({

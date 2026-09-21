@@ -46,12 +46,19 @@ const allowedOrigins = new Set([
   "https://www.doculisto.es"
 ]);
 
-app.use(cors({
+const corsOptions = {
   origin(origin, callback) {
     if (!origin || allowedOrigins.has(origin)) return callback(null, true);
-    return callback(new Error("Origin no permitido"));
-  }
-}));
+    return callback(null, false);
+  },
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -65,6 +72,16 @@ const upload = multer({
 app.get("/health", (_req, res) => {
   res.set("Cache-Control", "no-store");
   res.json({ ok: true, service: "doculisto-api" });
+});
+
+app.get("/api/diagnostic", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({
+    ok: true,
+    service: "doculisto-api",
+    analyze: true,
+    geminiConfigured: Boolean(process.env.GEMINI_API_KEY)
+  });
 });
 
 app.post("/api/analyze", rateLimitAnalysis, upload.single("document"), async (req, res) => {

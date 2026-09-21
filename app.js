@@ -326,17 +326,20 @@
   const CONSENT_KEY = 'doculisto_analytics_consent';
 
   function loadAnalytics() {
-    if (typeof window.gtag !== 'function') return;
+    if (typeof window.gtag !== 'function') {
+      window.setTimeout(loadAnalytics, 250);
+      return;
+    }
     window.gtag('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
       ad_user_data: 'denied',
       ad_personalization: 'denied'
     });
-    window.gtag('event', 'page_view', {
-      page_title: document.title,
-      page_location: window.location.href,
-      page_path: window.location.pathname
+    window.gtag('config', 'G-ZC7K8J3BSVS', {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false,
+      send_page_view: true
     });
   }
 

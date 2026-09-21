@@ -3,7 +3,20 @@
   const MEASUREMENT_ID = 'G-ZC7K8J3BSVS';
 
   function loadAnalytics() {
-    if (typeof window.gtag === 'function') return;
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+      window.gtag('config', MEASUREMENT_ID, {
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false,
+        send_page_view: true
+      });
+      return;
+    }
     window.dataLayer = window.dataLayer || [];
     window.gtag = function(){ window.dataLayer.push(arguments); };
     window.gtag('js', new Date());

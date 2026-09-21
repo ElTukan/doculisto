@@ -10,6 +10,7 @@
       allow_ad_personalization_signals: false
     };
     if (new URLSearchParams(window.location.search).has('gtm_debug')) cfg.debug_mode = true;
+
     window.gtag('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
@@ -23,9 +24,15 @@
     try { localStorage.setItem(CONSENT_KEY, value); } catch (_) {}
   }
 
-  function renderBanner() {
-    if (document.getElementById('consentBanner')) return;
-    const banner = document.createElement('aside');
+  function renderBanner(force = false) {
+    let banner = document.getElementById('consentBanner');
+
+    if (banner) {
+      banner.hidden = false;
+      return;
+    }
+
+    banner = document.createElement('aside');
     banner.id = 'consentBanner';
     banner.className = 'consent-banner';
     banner.setAttribute('aria-label', 'Preferencias de medición');
@@ -35,19 +42,26 @@
     document.getElementById('acceptAnalytics').addEventListener('click', () => {
       saveChoice('granted');
       configureAnalytics();
-      banner.remove();
+      banner.hidden = true;
     });
+
     document.getElementById('rejectAnalytics').addEventListener('click', () => {
       saveChoice('denied');
-      banner.remove();
+      banner.hidden = true;
     });
   }
 
+  const openButton = document.getElementById('openConsentPreferences');
+  openButton?.addEventListener('click', () => renderBanner(true));
+
   let saved = null;
   try { saved = localStorage.getItem(CONSENT_KEY); } catch (_) {}
+
   if (saved === 'granted') {
     configureAnalytics();
-  } else if (saved !== 'denied') {
-    window.setTimeout(renderBanner, 150);
+  } else if (saved === 'denied') {
+    // Keep Analytics disabled; the footer preferences button can reopen the panel.
+  } else {
+    window.setTimeout(() => renderBanner(false), 300);
   }
 })();

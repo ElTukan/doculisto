@@ -18,7 +18,12 @@
   }
   function setFile(file) {
     if (!file) return;
-    if (!ALLOWED.has(file.type)) { window.alert('Formato no compatible. Sube un PDF, JPG o PNG.'); return; }
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const allowedExtension = new Set(['pdf','jpg','jpeg','png']);
+    if (!ALLOWED.has(file.type) && !allowedExtension.has(extension)) {
+      window.alert('Formato no compatible. Sube un PDF, JPG o PNG.');
+      return;
+    }
     if (file.size > MAX_BYTES) { window.alert('El archivo supera el límite de 10 MB.'); return; }
     fileName.textContent = file.name;
     fileSize.textContent = formatSize(file.size);
@@ -44,10 +49,13 @@
       fileInput.click();
     }
   });
-  fileInput.addEventListener('change', (event) => {
+  const handlePickedFile = (event) => {
     const file = event.target.files?.[0];
     if (file) setFile(file);
-  });
+  };
+
+  fileInput.addEventListener('change', handlePickedFile);
+  fileInput.addEventListener('input', handlePickedFile);
 
   // Native file-picker errors should not leave the UI in an unusable state.
   fileInput.addEventListener('cancel', () => {

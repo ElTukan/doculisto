@@ -319,16 +319,30 @@
   const rejectAnalytics = document.getElementById('rejectAnalytics');
   const CONSENT_KEY = 'doculisto_analytics_consent';
 
+  function loadAnalytics() {
+    if (typeof window.gtag === 'function') return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('consent', 'default', {
+      analytics_storage: 'granted',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
+    window.gtag('config', 'G-ZC7K8J3BSVS', {
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
+    });
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZC7K8J3BSVS';
+    document.head.appendChild(script);
+  }
+
   function setAnalyticsConsent(value) {
     try { localStorage.setItem(CONSENT_KEY, value); } catch (_) {}
-    if (typeof window.gtag === 'function') {
-      window.gtag('consent', 'update', {
-        analytics_storage: value === 'granted' ? 'granted' : 'denied',
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied'
-      });
-    }
+    if (value === 'granted') loadAnalytics();
     if (consentBanner) consentBanner.hidden = true;
   }
 
@@ -336,7 +350,8 @@
     let saved = null;
     try { saved = localStorage.getItem(CONSENT_KEY); } catch (_) {}
     if (saved === 'granted' || saved === 'denied') {
-      setAnalyticsConsent(saved);
+      if (saved === 'granted') loadAnalytics();
+      consentBanner.hidden = true;
     } else {
       setTimeout(() => { consentBanner.hidden = false; }, 350);
     }

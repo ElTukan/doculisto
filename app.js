@@ -333,10 +333,10 @@
       ad_user_data: 'denied',
       ad_personalization: 'denied'
     });
-    window.gtag('config', 'G-ZC7K8J3BSVS', {
-      allow_google_signals: false,
-      allow_ad_personalization_signals: false,
-      send_page_view: true
+    window.gtag('event', 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
     });
   }
 

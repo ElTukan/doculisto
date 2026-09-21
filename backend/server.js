@@ -9,6 +9,12 @@ const port = process.env.PORT || 3000;
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
+app.use((_req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("Referrer-Policy", "no-referrer");
+  next();
+});
+
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_MAX = 12;
 const rateBuckets = new Map();
@@ -185,12 +191,6 @@ app.use((err, _req, res, _next) => {
     });
   }
   return res.status(500).json({ error: "Error interno." });
-});
-
-app.use((_req, res, next) => {
-  res.set("X-Content-Type-Options", "nosniff");
-  res.set("Referrer-Policy", "no-referrer");
-  next();
 });
 
 app.listen(port, () => {

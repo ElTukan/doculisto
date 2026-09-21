@@ -7,6 +7,7 @@
   const removeFile = document.getElementById('removeFile');
   const selectFileButton = document.getElementById('selectFileButton');
   const analyzeButton = document.getElementById('analyzeButton');
+  const ageCheck = document.getElementById('ageCheck');
   const demoResult = document.getElementById('demoResult');
   const menuButton = document.querySelector('.menu-button');
   const nav = document.querySelector('.nav');
@@ -17,6 +18,10 @@
     if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
+  function syncAnalyzeAvailability() {
+    analyzeButton.disabled = !fileInput.files?.[0] || !ageCheck?.checked;
+  }
+
   function setFile(file) {
     if (!file) return;
     const extension = file.name.split('.').pop()?.toLowerCase() || '';
@@ -30,14 +35,14 @@
     fileSize.textContent = formatSize(file.size);
     fileState.hidden = false;
     dropzone.style.display = 'none';
-    analyzeButton.disabled = false;
+    syncAnalyzeAvailability();
     demoResult.hidden = true;
   }
   function clearFile() {
     fileInput.value = '';
     fileState.hidden = true;
     dropzone.style.display = 'flex';
-    analyzeButton.disabled = true;
+    syncAnalyzeAvailability();
     demoResult.hidden = true;
   }
 
@@ -69,11 +74,12 @@
 
   fileInput.addEventListener('change', handlePickedFile);
   fileInput.addEventListener('input', handlePickedFile);
+  ageCheck?.addEventListener('change', syncAnalyzeAvailability);
 
   // Native file-picker errors should not leave the UI in an unusable state.
   fileInput.addEventListener('cancel', () => {
     if (!fileInput.files?.length) {
-      analyzeButton.disabled = true;
+      syncAnalyzeAvailability();
     }
   });
 

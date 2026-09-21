@@ -326,11 +326,8 @@
   const CONSENT_KEY = 'doculisto_analytics_consent';
 
   function loadAnalytics() {
-    if (typeof window.gtag === 'function') return;
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){ window.dataLayer.push(arguments); };
-    window.gtag('js', new Date());
-    window.gtag('consent', 'default', {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
       ad_user_data: 'denied',
@@ -338,12 +335,9 @@
     });
     window.gtag('config', 'G-ZC7K8J3BSVS', {
       allow_google_signals: false,
-      allow_ad_personalization_signals: false
+      allow_ad_personalization_signals: false,
+      send_page_view: true
     });
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZC7K8J3BSVS';
-    document.head.appendChild(script);
   }
 
   function setAnalyticsConsent(value) {

@@ -209,10 +209,6 @@
       const liveFill = document.getElementById('liveProgressFill');
       if (livePercent) livePercent.textContent = Math.round(progress) + '%';
       if (liveFill) liveFill.style.width = Math.round(progress) + '%';
-      const livePercent = document.getElementById('livePercent');
-      const liveFill = document.getElementById('liveProgressFill');
-      if (livePercent) livePercent.textContent = Math.round(progress) + '%';
-      if (liveFill) liveFill.style.width = Math.round(progress) + '%';
     };
 
     updateLoader();

@@ -12,7 +12,8 @@
       ad_user_data: 'denied',
       ad_personalization: 'denied'
     });
-    gtag('config', 'G-ZC7K8J3BSVS');
+    const tagAssistantDebug = new URLSearchParams(window.location.search).has('gtm_debug');
+    gtag('config', 'G-ZC7K8J3BSVS', tagAssistantDebug ? { debug_mode: true } : {});
   </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

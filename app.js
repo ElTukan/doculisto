@@ -5,6 +5,7 @@
   const fileName = document.getElementById('fileName');
   const fileSize = document.getElementById('fileSize');
   const removeFile = document.getElementById('removeFile');
+  const selectFileButton = document.getElementById('selectFileButton');
   const analyzeButton = document.getElementById('analyzeButton');
   const demoResult = document.getElementById('demoResult');
   const menuButton = document.querySelector('.menu-button');
@@ -40,13 +41,25 @@
     demoResult.hidden = true;
   }
 
-  // The upload area is a label linked to the hidden input. Keep keyboard support without
-  // triggering a second click, which can open the picker twice in some browsers.
+  function openFilePicker() {
+    fileInput.value = '';
+    fileInput.click();
+  }
+
+  dropzone.addEventListener('click', (event) => {
+    if (event.target.closest('#selectFileButton')) return;
+    openFilePicker();
+  });
+
+  selectFileButton?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openFilePicker();
+  });
+
   dropzone.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      fileInput.focus();
-      fileInput.click();
+      openFilePicker();
     }
   });
   const handlePickedFile = (event) => {

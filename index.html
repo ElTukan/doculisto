@@ -1,27 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZC7K8J3BSVS" onload="window.__doculistoGtagLoaded=true"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('consent', 'default', {
-      analytics_storage: 'denied',
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied'
-    });
-    const tagAssistantDebug = new URLSearchParams(window.location.search).has('gtm_debug');
-    const initialConfig = {
-      send_page_view: false,
-      allow_google_signals: false,
-      allow_ad_personalization_signals: false
-    };
-    if (tagAssistantDebug) initialConfig.debug_mode = true;
-    gtag('config', 'G-ZC7K8J3BSVS', initialConfig);
-  </script>
-  <meta charset="utf-8" />
+<meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#ffffff" />
   <meta name="description" content="DocuListo te ayuda a entender documentos y saber qué hacer después." />
@@ -202,17 +182,6 @@
     <div class="footer-links"><a href="/privacidad.html">Privacidad</a><a href="#faq">FAQ</a><a href="mailto:hola@doculisto.es">Contacto</a></div>
     <small>© 2026 DocuListo</small>
   </footer>
-
-  <aside class="consent-banner" id="consentBanner" aria-label="Preferencias de medición" hidden>
-    <div class="consent-copy">
-      <strong>Privacidad y medición</strong>
-      <p>Usamos Google Analytics para conocer cómo se utiliza DocuListo y mejorar la web. Puedes aceptar o rechazar la medición.</p>
-    </div>
-    <div class="consent-actions">
-      <button type="button" class="consent-secondary" id="rejectAnalytics">Rechazar</button>
-      <button type="button" class="consent-primary" id="acceptAnalytics">Aceptar</button>
-    </div>
-  </aside>
-  <script src="./app.js?v=20260921r"></script>
+<script src="./app.js?v=20260921-clean-analytics"></script>
 </body>
 </html>

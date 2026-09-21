@@ -349,7 +349,10 @@
   function setAnalyticsConsent(value) {
     try { localStorage.setItem(CONSENT_KEY, value); } catch (_) {}
     if (value === 'granted') loadAnalytics();
-    if (consentBanner) consentBanner.hidden = true;
+    if (consentBanner) {
+      consentBanner.hidden = true;
+      consentBanner.remove();
+    }
   }
 
   if (consentBanner) {

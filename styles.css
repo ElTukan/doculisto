@@ -195,3 +195,6 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 .age-check span{max-width:520px}
 
 .consent-banner[hidden]{display:none!important}
+
+.footer-preferences{appearance:none;border:0;background:transparent;padding:0;font:inherit;color:inherit;cursor:pointer;text-decoration:none}
+.footer-preferences:hover{text-decoration:underline}

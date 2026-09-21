@@ -166,3 +166,26 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 .analysis-error{background:#fff8f7;border-color:#f1ddda}
 .legal-page{max-width:880px}.legal-page h1{margin:0 0 18px;font-size:clamp(40px,6vw,64px);line-height:1.02;letter-spacing:-.06em}.legal-lead{max-width:720px;color:var(--muted);font-size:17px;margin:0 0 38px}.legal-page .faq{margin-top:0}
 @media(max-width:560px){.analysis-quick{grid-template-columns:1fr}}
+
+/* SEO guide layout */
+.article-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:30px}
+.article-card{display:block;padding:24px;border:1px solid var(--line);background:#fff;border-radius:20px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.article-card:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(19,24,39,.08);border-color:#d9d9e7}
+.article-card>span{display:block;font-size:10px;letter-spacing:.12em;font-weight:900;color:#8a919d;margin-bottom:10px}
+.article-card h2{margin:0 0 8px;font-size:22px;letter-spacing:-.04em}
+.article-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
+.article-page{max-width:900px}
+.article-page h1{margin:0 0 18px;font-size:clamp(42px,6vw,68px);line-height:1.01;letter-spacing:-.06em}
+.article-page h2{margin:38px 0 10px;font-size:27px;line-height:1.1;letter-spacing:-.04em}
+.article-page p{color:#555f6d;font-size:16px;line-height:1.78}
+.article-page .legal-footnote{font-size:12px;color:#8b929d;margin-top:40px}
+.article-callout{margin:34px 0;padding:22px 24px;border-radius:18px;background:#f7f7ff;border:1px solid #e5e4ff}
+.article-callout strong{display:block;font-size:13px;color:#5e58d8;margin-bottom:7px}
+.article-callout p{margin:0;font-size:14px}
+.article-cta{margin-top:52px;padding:30px;border-radius:22px;background:#121418;color:#fff}
+.article-cta h2{margin:0 0 8px;color:#fff}
+.article-cta p{margin:0 0 18px;color:#c9ced8;font-size:14px}
+.article-cta .nav-button{display:inline-block;border-color:#3b3f48;background:#fff;color:#14161a}
+.text-link{text-decoration:underline;text-underline-offset:3px}
+.legal-footnote{font-size:12px;color:#8b929d}
+@media(max-width:700px){.article-grid{grid-template-columns:1fr}.article-page h2{font-size:24px}.article-page p{font-size:15px}}

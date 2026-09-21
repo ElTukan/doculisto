@@ -189,3 +189,7 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 .text-link{text-decoration:underline;text-underline-offset:3px}
 .legal-footnote{font-size:12px;color:#8b929d}
 @media(max-width:700px){.article-grid{grid-template-columns:1fr}.article-page h2{font-size:24px}.article-page p{font-size:15px}}
+
+.age-check{display:flex;align-items:flex-start;gap:8px;margin-top:11px;color:#747c88;font-size:11px;line-height:1.45;cursor:pointer}
+.age-check input{margin:2px 0 0;accent-color:var(--accent)}
+.age-check span{max-width:520px}

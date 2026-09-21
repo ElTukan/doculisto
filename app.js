@@ -100,20 +100,39 @@
 
   function renderAnalysis(analysis) {
     const a = analysis || {};
-    const actions = listHtml(a.acciones, item => '<li>' + escapeHtml(item) + '</li>');
-    const docs = listHtml(a.documentos, item => '<li>' + escapeHtml(item) + '</li>');
-    const important = listHtml(a.importante, item => '<li>' + escapeHtml(item) + '</li>');
-    const deadlines = Array.isArray(a.plazos) && a.plazos.length
-      ? '<div class="deadline-list">' + a.plazos.map(p =>
+    const actionsList = Array.isArray(a.acciones) ? a.acciones : [];
+    const docsList = Array.isArray(a.documentos) ? a.documentos : [];
+    const importantList = Array.isArray(a.importante) ? a.importante : [];
+    const deadlinesList = Array.isArray(a.plazos) ? a.plazos : [];
+    const actions = listHtml(actionsList, item => '<li>' + escapeHtml(item) + '</li>');
+    const docs = listHtml(docsList, item => '<li>' + escapeHtml(item) + '</li>');
+    const important = listHtml(importantList, item => '<li>' + escapeHtml(item) + '</li>');
+    const deadlines = deadlinesList.length
+      ? '<div class="deadline-list">' + deadlinesList.map(p =>
           '<div class="deadline-item"><strong>' + escapeHtml(p.fecha) + '</strong><span>' + escapeHtml(p.contexto) + '</span></div>'
         ).join('') + '</div>'
       : '<p class="analysis-muted">No se identifica un plazo en el documento.</p>';
+
+    const quickAction = actionsList[0] || 'No se identifica una acción concreta';
+    const quickDeadline = deadlinesList[0]
+      ? escapeHtml(deadlinesList[0].fecha) + ' · ' + escapeHtml(deadlinesList[0].contexto)
+      : 'No se identifica un plazo';
 
     return `
       <div class="analysis-header">
         <div class="result-badge">Análisis completado</div>
         <h3>${escapeHtml(a.tipo || 'Documento analizado')}</h3>
         <p>${escapeHtml(a.resumen || 'No se ha podido obtener un resumen claro.')}</p>
+      </div>
+      <div class="analysis-quick">
+        <div class="quick-card">
+          <span>PRIMER PASO</span>
+          <strong>${escapeHtml(quickAction)}</strong>
+        </div>
+        <div class="quick-card">
+          <span>PRÓXIMO PLAZO</span>
+          <strong>${quickDeadline}</strong>
+        </div>
       </div>
       <div class="analysis-section">
         <span class="analysis-label">QUÉ TIENES QUE HACER</span>
@@ -229,8 +248,13 @@
       if (progress < targetProgress) progress += Math.max(.35, (targetProgress-progress)*.06);
       const percent = document.getElementById('loadingPercent');
       const fill = document.getElementById('loadingBarFill');
-      if (percent) percent.textContent = Math.round(progress) + '%';
-      if (fill) fill.style.width = Math.round(progress) + '%';
+      const livePercent = document.getElementById('livePercent');
+      const liveFill = document.getElementById('liveProgressFill');
+      const rounded = Math.round(progress);
+      if (percent) percent.textContent = rounded + '%';
+      if (fill) fill.style.width = rounded + '%';
+      if (livePercent) livePercent.textContent = rounded + '%';
+      if (liveFill) liveFill.style.width = rounded + '%';
     }, 90);
 
     const stepTimer = window.setInterval(() => {

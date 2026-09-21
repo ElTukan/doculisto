@@ -1,52 +1,34 @@
 <!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,follow">
-  <meta name="description" content="Información de privacidad de DocuListo.">
-  <link rel="canonical" href="https://doculisto.es/privacidad.html">
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="stylesheet" href="./styles.css">
-  <title>Privacidad — DocuListo</title>
-</head>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<meta name="description" content="Política de privacidad de DocuListo.">
+<link rel="canonical" href="https://doculisto.es/privacidad.html">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./styles.css">
+<title>Privacidad — DocuListo</title></head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="/" aria-label="DocuListo, inicio">
-      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-      <span>Docu<span>Listo</span></span>
-    </a>
-    <a class="nav-button" href="/">Volver a DocuListo</a>
-  </header>
-  <main>
-    <section class="section legal-page">
-      <p class="section-label">PRIVACIDAD</p>
-      <h1>Cómo tratamos los documentos en la versión de prueba</h1>
-      <p class="legal-lead">Esta página describe el funcionamiento actual del prototipo de DocuListo. La información se actualizará antes de abrir el servicio a uso general.</p>
-
-      <div class="faq">
-        <details open>
-          <summary>¿Se guarda mi documento?</summary>
-          <p>DocuListo recibe el archivo para poder analizarlo. En el backend actual se procesa en memoria y no se guarda en disco ni se mantiene una copia en una base de datos.</p>
-        </details>
-        <details open>
-          <summary>¿Se envía a un servicio externo?</summary>
-          <p>Sí. El análisis utiliza un proveedor externo de IA. DocuListo envía el contenido necesario para generar el resultado y la configuración del backend solicita que la interacción no se almacene como una conversación.</p>
-        </details>
-        <details open>
-          <summary>¿Qué puedo hacer durante la prueba?</summary>
-          <p>No subas DNI, certificados, historiales médicos, datos bancarios, contraseñas, documentos con firmas ni otra información especialmente sensible. Esta versión está pensada para validar el funcionamiento con documentos de prueba o con información que puedas compartir con seguridad.</p>
-        </details>
-        <details open>
-          <summary>Contacto</summary>
-          <p>Para cuestiones sobre privacidad o sobre el funcionamiento de esta versión, puedes escribir a <a href="mailto:hola@doculisto.es">hola@doculisto.es</a>.</p>
-        </details>
-      </div>
-    </section>
-  </main>
-  <footer class="site-footer">
-    <div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>Docu<span>Listo</span></span></a><p>Entiende tus documentos. Sabe qué hacer.</p></div>
-    <small>© 2026 DocuListo</small>
-  </footer>
-</body>
-</html>
+<header class="site-header">
+<a class="brand" href="/" aria-label="DocuListo, inicio"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>Docu<span>Listo</span></span></a>
+<a class="nav-button" href="/">Volver a DocuListo</a>
+</header>
+<main><section class="section legal-page">
+<p class="section-label">PRIVACIDAD</p>
+<h1>Tu privacidad y tus documentos</h1>
+<p class="legal-lead">Esta política explica qué datos trata actualmente DocuListo, para qué los necesita y qué proveedores intervienen.</p>
+<div class="faq">
+<details open><summary>Responsable del tratamiento</summary><p><strong>Alex Muñoz Castellano</strong>, titular de DocuListo. Contacto: <a href="mailto:hola@doculisto.es">hola@doculisto.es</a>. El domicilio o establecimiento legal se incorporará al aviso legal cuando se complete ese dato.</p></details>
+<details open><summary>Datos que tratamos</summary><p>Podemos tratar el archivo que subas para analizarlo, su nombre y metadatos básicos, datos técnicos necesarios para prestar y proteger el servicio y, cuando exista consentimiento, datos de analítica web.</p></details>
+<details open><summary>Finalidades y bases jurídicas</summary><p>Utilizamos el documento para realizar el análisis solicitado. La base jurídica dependerá del tratamiento concreto y podrá incluir la ejecución de la solicitud del servicio y el consentimiento cuando corresponda. La analítica no esencial se carga únicamente después de una acción afirmativa.</p></details>
+<details open><summary>Procesamiento del documento</summary><p>El backend actual procesa el archivo en memoria y no mantiene deliberadamente una copia en una base de datos propia. El contenido sí se transmite a proveedores técnicos necesarios para generar el análisis.</p></details>
+<details open><summary>Google Gemini</summary><p>DocuListo utiliza la API de Gemini de Google. La petición actual usa <code>store=false</code> para evitar crear una interacción persistente. Las condiciones de Google distinguen el almacenamiento de interacciones de los registros limitados que pueden existir por seguridad, prevención de abusos u obligaciones legales.</p><p>Google indica que, para el uso de la API desde el Espacio Económico Europeo, las condiciones de uso de datos de los Servicios Pagados se aplican también a la cuota no pagada. En esos Servicios Google no utiliza los prompts, archivos y respuestas para mejorar sus productos, aunque puede conservarlos durante un periodo limitado para seguridad, prevención de usos prohibidos y obligaciones legales.</p><p><strong>No envíes documentos que no estés autorizado a compartir ni información especialmente sensible si no es necesaria.</strong></p><p><a href="https://ai.google.dev/gemini-api/terms?hl=es-419" target="_blank" rel="noopener noreferrer">Condiciones de la API de Gemini</a> · <a href="https://ai.google.dev/gemini-api/docs/zdr?hl=es-419" target="_blank" rel="noopener noreferrer">Información sobre retención de datos</a>.</p></details>
+<details open><summary>Render</summary><p>El backend se ejecuta en Render. En la configuración actual no guardamos los documentos en disco. La documentación de Render indica que el periodo de retención de logs depende del plan y que en el plan Hobby es de 7 días. Los logs de aplicación de DocuListo no están diseñados para incluir el contenido del documento.</p></details>
+<details open><summary>Google Analytics</summary><p>DocuListo utiliza Google Analytics para estadísticas de uso. En la configuración actual se carga solamente después de aceptar la medición. Puedes rechazarla y seguir utilizando la web.</p></details>
+<details open><summary>Google AdSense</summary><p>Cuando se active Google AdSense, se incorporará la configuración de consentimiento necesaria para publicidad. Para usuarios del Espacio Económico Europeo, Reino Unido y Suiza, Google exige una CMP certificada e integrada con el TCF cuando se sirvan anuncios personalizados.</p></details>
+<details open><summary>Conservación</summary><p>Los datos se conservarán durante el tiempo necesario para la finalidad correspondiente y durante los plazos que puedan resultar exigibles por ley. Los proveedores externos pueden aplicar sus propios periodos de conservación.</p></details>
+<details open><summary>Derechos</summary><p>Puedes solicitar acceso, rectificación, supresión, limitación u oposición cuando proceda escribiendo a <a href="mailto:hola@doculisto.es">hola@doculisto.es</a>. También puedes presentar una reclamación ante la <a href="https://www.aepd.es/" target="_blank" rel="noopener noreferrer">Agencia Española de Protección de Datos</a>.</p></details>
+</div>
+<p class="legal-footnote">Última actualización: 21 de septiembre de 2026. Esta política deberá revisarse cuando cambien los proveedores, la monetización o el modo de tratamiento de documentos.</p>
+</section></main>
+<footer class="site-footer"><div><a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>Docu<span>Listo</span></span></a><p>Entiende tus documentos. Sabe qué hacer.</p></div><div class="footer-links"><a href="/guias/">Guías</a><a href="/privacidad.html">Privacidad</a><a href="/cookies.html">Cookies</a><a href="/condiciones.html">Condiciones</a><a href="/aviso-legal.html">Aviso legal</a></div><small>© 2026 DocuListo</small></footer>
+</body></html>

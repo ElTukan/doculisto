@@ -193,3 +193,5 @@ summary{cursor:pointer;list-style:none;font-weight:750;font-size:16px}summary::-
 .age-check{display:flex;align-items:flex-start;gap:8px;margin-top:11px;color:#747c88;font-size:11px;line-height:1.45;cursor:pointer}
 .age-check input{margin:2px 0 0;accent-color:var(--accent)}
 .age-check span{max-width:520px}
+
+.consent-banner[hidden]{display:none!important}

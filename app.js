@@ -13,6 +13,37 @@
   const nav = document.querySelector('.nav');
   const MAX_BYTES = 10 * 1024 * 1024;
   const ALLOWED = new Set(['application/pdf','image/jpeg','image/png']);
+  const API_BASE = 'https://api.doculisto.es';
+  const API_WARMUP_TIMEOUT_MS = 75000;
+  const API_ANALYSIS_TIMEOUT_MS = 90000;
+  let apiWarmupPromise = null;
+
+  function warmApi() {
+    if (apiWarmupPromise) return apiWarmupPromise;
+    apiWarmupPromise = fetch(API_BASE + '/health', {
+      method: 'GET',
+      cache: 'no-store'
+    }).then(response => {
+      if (!response.ok) throw new Error('El analizador no está disponible.');
+      return true;
+    }).finally(() => {
+      apiWarmupPromise = null;
+    });
+    return apiWarmupPromise;
+  }
+
+  function withTimeout(promise, ms, message) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        window.setTimeout(() => {
+          const error = new Error(message);
+          error.name = 'TimeoutError';
+          reject(error);
+        }, ms);
+      })
+    ]);
+  }
 
   function formatSize(bytes) {
     if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
@@ -37,6 +68,8 @@
     dropzone.style.display = 'none';
     syncAnalyzeAvailability();
     demoResult.hidden = true;
+    // Wake Render as soon as a document is selected.
+    warmApi().catch(() => {});
   }
   function clearFile() {
     fileInput.value = '';
@@ -270,14 +303,50 @@
       }
     }, 1550);
 
+    let waitingTimer = null;
+    let lateWaitingTimer = null;
+
     try {
       const formData = new FormData();
       formData.append('document', file, file.name);
 
-      const response = await fetch('https://api.doculisto.es/api/analyze', {
-        method: 'POST',
-        body: formData
-      });
+      const setLoadingMessage = (text, percentValue) => {
+        const step = document.getElementById('loadingStep');
+        const liveStep = document.getElementById('liveStep');
+        const percent = document.getElementById('loadingPercent');
+        const livePercent = document.getElementById('livePercent');
+        const fill = document.getElementById('loadingBarFill');
+        const liveFill = document.getElementById('liveProgressFill');
+        if (step) step.textContent = text;
+        if (liveStep) liveStep.textContent = text;
+        if (percent) percent.textContent = percentValue + '%';
+        if (livePercent) livePercent.textContent = percentValue + '%';
+        if (fill) fill.style.width = percentValue + '%';
+        if (liveFill) liveFill.style.width = percentValue + '%';
+      };
+
+      waitingTimer = window.setTimeout(() => setLoadingMessage('Conectando con el analizador…', 93), 6500);
+      lateWaitingTimer = window.setTimeout(() => setLoadingMessage('Procesando el documento…', 97), 16000);
+
+      // Wake Render before uploading when the free service has been idle.
+      try {
+        await withTimeout(
+          warmApi(),
+          API_WARMUP_TIMEOUT_MS,
+          'El servidor está tardando demasiado en iniciarse. Inténtalo de nuevo en unos segundos.'
+        );
+      } catch (_) {
+        // The analysis request can still wake the service.
+      }
+
+      const response = await withTimeout(
+        fetch(API_BASE + '/api/analyze', {
+          method: 'POST',
+          body: formData
+        }),
+        API_ANALYSIS_TIMEOUT_MS,
+        'El analizador ha tardado demasiado en responder. Puede que el servidor gratuito se esté iniciando. Inténtalo de nuevo en unos segundos.'
+      );
 
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'No se ha podido analizar el documento.');
@@ -294,6 +363,8 @@
       await new Promise(resolve => window.setTimeout(resolve, remaining + 220));
       showAnalysisResult(result.analysis);
     } catch (error) {
+      window.clearTimeout(waitingTimer);
+      window.clearTimeout(lateWaitingTimer);
       window.clearInterval(stepTimer);
       demoResult.hidden = false;
       demoResult.className = 'demo-result analysis-error';
@@ -301,6 +372,8 @@
       demoResult.querySelector('p').textContent = error?.message || 'Ha ocurrido un error. Inténtalo de nuevo.';
       demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } finally {
+      window.clearTimeout(waitingTimer);
+      window.clearTimeout(lateWaitingTimer);
       window.clearInterval(stepTimer);
       window.clearInterval(progressTimer);
       analyzeButton.disabled = false;

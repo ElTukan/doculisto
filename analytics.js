@@ -2,22 +2,9 @@
   const CONSENT_KEY = 'doculisto_analytics_consent';
   const MEASUREMENT_ID = 'G-ZC7K8J3BSVS';
 
-  function startAnalytics() {
-    window.dataLayer = window.dataLayer || [];
-    if (typeof window.gtag !== 'function') {
-      window.gtag = function(){ window.dataLayer.push(arguments); };
-      window.gtag('js', new Date());
-      window.gtag('consent', 'default', {
-        analytics_storage: 'denied',
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied'
-      });
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + MEASUREMENT_ID;
-      document.head.appendChild(script);
-    }
+  function configureAnalytics() {
+    if (window.__doculistoAnalyticsStarted || !window.__doculistoGtagLoaded || typeof window.gtag !== 'function') return false;
+
     window.gtag('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
@@ -27,13 +14,38 @@
     window.gtag('config', MEASUREMENT_ID, {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      send_page_view: false
+      send_page_view: true,
+      transport_type: 'beacon'
     });
-    window.gtag('event', 'page_view', {
-      page_title: document.title,
-      page_location: window.location.href,
-      page_path: window.location.pathname
-    });
+    window.__doculistoAnalyticsStarted = true;
+    return true;
+  }
+
+  function startAnalytics() {
+    window.dataLayer = window.dataLayer || [];
+
+    if (typeof window.gtag !== 'function') {
+      window.gtag = function(){ window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + MEASUREMENT_ID;
+      script.onload = () => {
+        window.__doculistoGtagLoaded = true;
+        configureAnalytics();
+      };
+      document.head.appendChild(script);
+      return;
+    }
+
+    configureAnalytics();
   }
 
   function showBanner() {
@@ -44,6 +56,7 @@
     banner.setAttribute('aria-label', 'Preferencias de medición');
     banner.innerHTML = '<div class="consent-copy"><strong>Privacidad y medición</strong><p>Usamos Google Analytics para conocer el uso de DocuListo y mejorar la web. Puedes aceptar o rechazar la medición.</p></div><div class="consent-actions"><button type="button" class="consent-secondary" id="rejectAnalytics">Rechazar</button><button type="button" class="consent-primary" id="acceptAnalytics">Aceptar</button></div>';
     document.body.appendChild(banner);
+
     document.getElementById('acceptAnalytics').addEventListener('click', () => {
       try { localStorage.setItem(CONSENT_KEY, 'granted'); } catch (_) {}
       startAnalytics();

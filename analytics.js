@@ -27,7 +27,12 @@
     window.gtag('config', MEASUREMENT_ID, {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      send_page_view: true
+      send_page_view: false
+    });
+    window.gtag('event', 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
     });
   }
 

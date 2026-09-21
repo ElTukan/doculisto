@@ -339,14 +339,26 @@
         // The analysis request can still wake the service.
       }
 
-      const response = await withTimeout(
-        fetch(API_BASE + '/api/analyze', {
-          method: 'POST',
-          body: formData
-        }),
-        API_ANALYSIS_TIMEOUT_MS,
-        'El analizador ha tardado demasiado en responder. Puede que el servidor gratuito se esté iniciando. Inténtalo de nuevo en unos segundos.'
-      );
+      let response;
+      try {
+        response = await withTimeout(
+          fetch(API_BASE + '/api/analyze', {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            body: formData
+          }),
+          API_ANALYSIS_TIMEOUT_MS,
+          'El analizador ha tardado demasiado en responder. Puede que el servidor gratuito se esté iniciando. Inténtalo de nuevo en unos segundos.'
+        );
+      } catch (requestError) {
+        if (requestError?.name === 'TimeoutError') throw requestError;
+        const message = requestError?.message || '';
+        if (requestError instanceof TypeError) {
+          throw new Error('No se ha podido conectar con el servidor del analizador. Comprueba que la API esté activa y accesible.');
+        }
+        throw new Error(message || 'No se ha podido conectar con el servidor del analizador.'); 
+      }
 
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'No se ha podido analizar el documento.');

@@ -5,7 +5,6 @@
   function configureAnalytics() {
     if (typeof window.gtag !== 'function') return;
     const cfg = {
-      send_page_view: true,
       allow_google_signals: false,
       allow_ad_personalization_signals: false
     };
@@ -18,6 +17,22 @@
       ad_personalization: 'denied'
     });
     window.gtag('config', MEASUREMENT_ID, cfg);
+
+    // The initial gtag('config', ...) in <head> is sent with
+    // send_page_view: false (consent is denied by default until the
+    // banner is answered). Once consent is granted, calling
+    // gtag('config', ...) again does NOT reliably re-trigger an
+    // automatic page_view in gtag.js, because the tracker for this
+    // measurement ID already exists. That is why GA4 was showing
+    // users/events but 0 page views. Firing page_view explicitly here
+    // guarantees a real, measurable view every time consent is
+    // granted (on first accept, and on every later page load once
+    // consent was already saved as granted).
+    window.gtag('event', 'page_view', {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname + window.location.search
+    });
   }
 
   function saveChoice(value) {

@@ -45,6 +45,11 @@
     ]);
   }
 
+  function trackEvent(name, params) {
+    if (typeof window.gtag !== 'function') return;
+    window.gtag('event', name, params || {});
+  }
+
   function formatSize(bytes) {
     if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
@@ -233,6 +238,7 @@
       <div class="success-content">${renderAnalysis(analysis)}</div>`;
     requestAnimationFrame(() => demoResult.classList.add('is-visible'));
     demoResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    trackEvent('document_analysis_complete');
   }
 
   analyzeButton.addEventListener('click', async () => {
@@ -243,6 +249,7 @@
     analyzeButton.disabled = true;
     analyzeButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Analizando';
     showAnalyzingState();
+    trackEvent('document_analysis_start', { file_type: file.type || 'unknown' });
 
     const loadingStartedAt = performance.now();
     const MIN_LOADING_MS = 2400;

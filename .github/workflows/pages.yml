@@ -38,10 +38,7 @@ jobs:
           mkdir -p _site
 
           cp .nojekyll CNAME robots.txt sitemap.xml ads.txt _site/
-          cp index.html *.html *.css *.js *.svg _site/
-
-          rm -f _site/404.html
-          cp 404.html _site/404.html
+          cp *.html *.css *.js *.svg _site/
 
           rm -rf _site/guias
           cp -R guias _site/guias

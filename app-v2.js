@@ -41,7 +41,22 @@
   }
   function clearFile() { selectedFile = null; fileInput.value = ''; clearPreview(); fileState.hidden = true; dropzone.style.display = 'flex'; syncAvailability(); demoResult.hidden = true; }
   function openPicker() { fileInput.value = ''; fileInput.click(); }
-  async function warmApi() { try { const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 8000); await fetch(`${API_BASE}/health`, { cache: 'no-store', signal: controller.signal }); clearTimeout(timer); } catch (_) {} }
+  function warmApi() {
+    if (warmupPromise) return warmupPromise;
+    warmupPromise = (async () => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      try {
+        await fetch(`${API_BASE}/health`, { cache: 'no-store', signal: controller.signal });
+      } catch (_) {
+        // A warm-up failure must never block a real analysis request.
+      } finally {
+        clearTimeout(timer);
+        warmupPromise = null;
+      }
+    })();
+    return warmupPromise;
+  }
   function requestAnalysis(file, onUploadProgress) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest(); xhr.open('POST', `${API_BASE}/api/analyze`); xhr.timeout = API_TIMEOUT_MS; xhr.responseType = 'json';

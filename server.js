@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
+import { applySecurityHeaders, hasValidFileSignature } from "./security.js";
 
 const PRIMARY_MODEL = "gemini-3.5-flash-lite";
 const FALLBACK_MODEL = "gemini-3.5-flash";
@@ -30,12 +31,7 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
-app.use((_req, res, next) => {
-  res.set("X-Content-Type-Options", "nosniff");
-  res.set("Referrer-Policy", "no-referrer");
-  res.set("Cache-Control", "no-store");
-  next();
-});
+applySecurityHeaders(app);
 
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_MAX = 12;
@@ -156,61 +152,28 @@ Reglas:
 const ANALYSIS_SCHEMA = {
   type: "object",
   properties: {
-    tipo: {
-      type: "string"
-    },
-    resumen: {
-      type: "string"
-    },
-    acciones: {
-      type: "array",
-      items: {
-        type: "string"
-      }
-    },
+    tipo: { type: "string" },
+    resumen: { type: "string" },
+    acciones: { type: "array", items: { type: "string" } },
     plazos: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          fecha: {
-            type: "string"
-          },
-          contexto: {
-            type: "string"
-          }
+          fecha: { type: "string" },
+          contexto: { type: "string" }
         },
         required: ["fecha", "contexto"]
       }
     },
-    documentos: {
-      type: "array",
-      items: {
-        type: "string"
-      }
-    },
-    donde: {
-      type: "string"
-    },
-    importante: {
-      type: "array",
-      items: {
-        type: "string"
-      }
-    },
-    fuente: {
-      type: "string"
-    }
+    documentos: { type: "array", items: { type: "string" } },
+    donde: { type: "string" },
+    importante: { type: "array", items: { type: "string" } },
+    fuente: { type: "string" }
   },
   required: [
-    "tipo",
-    "resumen",
-    "acciones",
-    "plazos",
-    "documentos",
-    "donde",
-    "importante",
-    "fuente"
+    "tipo", "resumen", "acciones", "plazos", "documentos",
+    "donde", "importante", "fuente"
   ]
 };
 
@@ -222,6 +185,12 @@ app.post(
     if (!req.file) {
       return res.status(400).json({
         error: "Debes subir un PDF, JPG o PNG."
+      });
+    }
+
+    if (!hasValidFileSignature(req.file)) {
+      return res.status(400).json({
+        error: "El archivo no coincide con un PDF, JPG o PNG válido."
       });
     }
 
@@ -238,10 +207,7 @@ app.post(
 
       const encodedDocument = req.file.buffer.toString("base64");
       const input = [
-        {
-          type: "text",
-          text: ANALYSIS_PROMPT
-        },
+        { type: "text", text: ANALYSIS_PROMPT },
         {
           type: "document",
           data: encodedDocument,
@@ -272,19 +238,14 @@ app.post(
           break;
         } catch (error) {
           lastError = error;
-
           const status = Number(error?.status || error?.statusCode || error?.code || 0);
           const message = String(error?.message || "").toLowerCase();
-
           const retryable =
             status === 429 ||
             status === 503 ||
             /quota|resource exhausted|rate limit|too many requests|high demand|unavailable/.test(message);
 
-          if (!retryable || model === FALLBACK_MODEL) {
-            throw error;
-          }
-
+          if (!retryable || model === FALLBACK_MODEL) throw error;
           console.warn(`Model ${model} unavailable; trying ${FALLBACK_MODEL}`);
         }
       }
@@ -302,7 +263,6 @@ app.post(
       }
 
       let analysis;
-
       try {
         analysis = JSON.parse(raw);
       } catch {
@@ -322,33 +282,22 @@ app.post(
       });
     } catch (error) {
       console.error("DocuListo analyze error:", error);
-
       const message = String(error?.message || "").toLowerCase();
       const status = Number(error?.status || error?.code || 0);
 
-      if (
-        status === 429 ||
-        /quota|resource exhausted|rate limit|too many requests/.test(message)
-      ) {
+      if (status === 429 || /quota|resource exhausted|rate limit|too many requests/.test(message)) {
         return res.status(503).json({
           error: "El servicio de IA ha alcanzado temporalmente su límite de uso. Vuelve a intentarlo en unos minutos."
         });
       }
 
-      if (
-        status === 401 ||
-        status === 403 ||
-        /api key|permission|unauthorized|forbidden/.test(message)
-      ) {
+      if (status === 401 || status === 403 || /api key|permission|unauthorized|forbidden/.test(message)) {
         return res.status(503).json({
           error: "El servicio de IA no está autorizado correctamente."
         });
       }
 
-      if (
-        status === 400 ||
-        /invalid argument|bad request|unsupported/.test(message)
-      ) {
+      if (status === 400 || /invalid argument|bad request|unsupported/.test(message)) {
         return res.status(400).json({
           error: "El proveedor de IA ha rechazado este documento o su formato."
         });
@@ -363,28 +312,19 @@ app.post(
 
 app.use((err, _req, res, _next) => {
   if (err?.code === "LIMIT_FILE_SIZE") {
-    return res.status(413).json({
-      error: "El archivo supera el límite de 10 MB."
-    });
+    return res.status(413).json({ error: "El archivo supera el límite de 10 MB." });
   }
 
   if (err?.code === "LIMIT_UNEXPECTED_FILE") {
-    return res.status(400).json({
-      error: "Formato no válido. Usa PDF, JPG o PNG."
-    });
+    return res.status(400).json({ error: "Formato no válido. Usa PDF, JPG o PNG." });
   }
 
   if (err instanceof multer.MulterError) {
-    return res.status(400).json({
-      error: "No se ha podido recibir el archivo."
-    });
+    return res.status(400).json({ error: "No se ha podido recibir el archivo." });
   }
 
   console.error("DocuListo server error:", err);
-
-  return res.status(500).json({
-    error: "Error interno del servidor."
-  });
+  return res.status(500).json({ error: "Error interno del servidor." });
 });
 
 app.listen(port, () => {

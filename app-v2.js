@@ -19,6 +19,7 @@
   const API_TIMEOUT_MS = 120000;
   let previewUrl = null;
   let selectedFile = null;
+  let warmupPromise = null;
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   const formatSize = (bytes) => bytes < 1024 * 1024 ? Math.max(1, Math.round(bytes / 1024)) + ' KB' : (bytes / (1024 * 1024)).toFixed(1) + ' MB';
@@ -36,7 +37,7 @@
     if (file.size > MAX_BYTES) { window.alert('El archivo supera el límite de 10 MB.'); return; }
     selectedFile = file; clearPreview();
     if (file.type.startsWith('image/') && fileIcon) { previewUrl = URL.createObjectURL(file); fileIcon.textContent = ''; fileIcon.style.backgroundImage = `url("${previewUrl}")`; fileIcon.classList.add('has-preview'); }
-    fileName.textContent = file.name; fileSize.textContent = formatSize(file.size); fileState.hidden = false; dropzone.style.display = 'none'; syncAvailability(); demoResult.hidden = true; if (navigator.vibrate) navigator.vibrate(12);
+    fileName.textContent = file.name; fileSize.textContent = formatSize(file.size); fileState.hidden = false; dropzone.style.display = 'none'; syncAvailability(); demoResult.hidden = true; if (navigator.vibrate) navigator.vibrate(12); warmApi();
   }
   function clearFile() { selectedFile = null; fileInput.value = ''; clearPreview(); fileState.hidden = true; dropzone.style.display = 'flex'; syncAvailability(); demoResult.hidden = true; }
   function openPicker() { fileInput.value = ''; fileInput.click(); }
@@ -63,7 +64,7 @@
   async function analyze() {
     if (!selectedFile || !ageCheck?.checked || analyzeButton.disabled) return;
     const file = selectedFile; analyzeButton.disabled = true; analyzeButton.innerHTML = '<span class="button-spinner" aria-hidden="true"></span> Analizando'; showLive('Iniciando el analizador…', 5); trackEvent('document_analysis_start', { file_type: file.type || 'unknown' });
-    try { await warmApi(); const result = await requestAnalysis(file, (percent) => setProgress(percent, percent < 78 ? 'Subiendo el documento…' : 'Documento recibido. Procesando con IA…')); setProgress(90, 'Procesando el documento con IA…'); if (!result?.analysis) throw new Error('El analizador no ha devuelto un resultado válido.'); setProgress(100, 'Análisis completado.'); await new Promise(resolve => setTimeout(resolve, 250)); showResult(result.analysis); }
+    try { if (warmupPromise) await warmupPromise; const result = await requestAnalysis(file, (percent) => setProgress(percent, percent < 78 ? 'Subiendo el documento…' : 'Documento recibido. Procesando con IA…')); setProgress(90, 'Procesando el documento con IA…'); if (!result?.analysis) throw new Error('El analizador no ha devuelto un resultado válido.'); setProgress(100, 'Análisis completado.'); await new Promise(resolve => setTimeout(resolve, 250)); showResult(result.analysis); }
     catch (error) { showError(error?.message || 'Ha ocurrido un error. Inténtalo de nuevo.'); }
     finally { analyzeButton.disabled = false; analyzeButton.innerHTML = 'Analizar documento <span aria-hidden="true">→</span>'; }
   }

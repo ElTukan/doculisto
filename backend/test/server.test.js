@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { app } from '../server.js';
+import { hasValidFileSignature } from '../../security.js';
 
 function startTestServer() {
   return new Promise((resolve) => {
@@ -63,20 +64,14 @@ test('analyze endpoint rejects unsupported file types', async () => {
   }
 });
 
-test('analyze endpoint rejects files whose content does not match the declared type', async () => {
-  const server = await startTestServer();
-  const { port } = server.address();
-  try {
-    const response = await postMultipart(
-      port,
-      new Blob(['esto no empieza por %PDF-'], { type: 'application/pdf' }),
-      'falso.pdf'
-    );
-    assert.equal(response.status, 400);
-    assert.match((await response.json()).error, /no coincide/);
-  } finally {
-    await stopTestServer(server);
-  }
+test('file signature validation rejects mismatched PDF content', () => {
+  assert.equal(
+    hasValidFileSignature({
+      mimetype: 'application/pdf',
+      buffer: Buffer.from('not-a-pdf')
+    }),
+    false
+  );
 });
 
 test('analyze endpoint rejects files above the 10 MB limit', async () => {

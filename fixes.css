@@ -1,0 +1,12 @@
+/* DocuListo audit fixes: mobile, accessibility and resilient UX. */
+.nav.mobile-open{display:flex;position:absolute;z-index:40;top:72px;left:12px;right:12px;padding:14px;flex-direction:column;align-items:stretch;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(19,24,39,.10)}
+.dropzone{touch-action:manipulation;min-height:245px}
+.select-file-button,.primary-button,.remove-file,.age-check input{min-height:44px}
+.age-check{padding:8px 0}
+.age-check input{width:20px;height:20px;flex:0 0 20px}
+.file-icon.has-preview{background-size:cover;background-position:center;background-repeat:no-repeat}
+.retry-button{margin-top:14px;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:11px;padding:11px 14px;font-weight:800;cursor:pointer}
+.retry-button:hover{border-color:#bdb9ff;background:#f8f8ff}
+@media(max-width:900px){.nav.mobile-open{display:flex}.dropzone{min-height:260px}.menu-button{min-width:44px;min-height:44px}}
+@media(max-width:560px){.dropzone{min-height:240px;padding:18px}.select-file-button{width:100%;min-height:48px}.primary-button{min-height:50px}.age-check{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.nav.mobile-open{scroll-behavior:auto}}

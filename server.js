@@ -6,6 +6,17 @@ import { applySecurityHeaders, hasValidFileSignature } from "./security.js";
 
 const PRIMARY_MODEL = "gemini-3.5-flash-lite";
 const FALLBACK_MODEL = "gemini-3.5-flash";
+let geminiClient = null;
+
+function getGeminiClient() {
+  if (!process.env.GEMINI_API_KEY) return null;
+  if (!geminiClient) {
+    geminiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY
+    });
+  }
+  return geminiClient;
+}
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -101,9 +112,15 @@ app.get("/api/diagnostic", async (_req, res) => {
   }
 
   try {
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY
-    });
+    const ai = getGeminiClient();
+    if (!ai) {
+      return res.status(503).json({
+        ok: false,
+        service: "doculisto-api",
+        geminiConfigured: false,
+        modelAvailable: false
+      });
+    }
 
     const model = await ai.models.get({
       model: PRIMARY_MODEL
@@ -201,9 +218,12 @@ app.post(
     }
 
     try {
-      const ai = new GoogleGenAI({
-        apiKey: process.env.GEMINI_API_KEY
-      });
+      const ai = getGeminiClient();
+      if (!ai) {
+        return res.status(503).json({
+          error: "El analizador todavía no está configurado."
+        });
+      }
 
       const encodedDocument = req.file.buffer.toString("base64");
       const input = [

@@ -30,13 +30,29 @@ jobs:
       - name: Generate sitemap automatically
         run: python3 scripts/generate-sitemap.py
 
+      - name: Build public Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+
+          cp .nojekyll CNAME robots.txt sitemap.xml ads.txt _site/
+          cp index.html *.html *.css *.js *.svg _site/
+
+          rm -f _site/404.html
+          cp 404.html _site/404.html
+
+          rm -rf _site/guias
+          cp -R guias _site/guias
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: "_site"
 
       - name: Deploy to GitHub Pages
         id: deployment

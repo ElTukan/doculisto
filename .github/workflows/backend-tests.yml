@@ -24,5 +24,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Validate SEO scripts
+        run: python3 -m py_compile scripts/prepare-seo.py scripts/generate-sitemap.py
+        working-directory: .
       - name: Run tests
         run: npm test

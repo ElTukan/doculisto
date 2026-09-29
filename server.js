@@ -47,6 +47,18 @@ applySecurityHeaders(app);
 const RATE_WINDOW_MS = 15 * 60 * 1000;
 const RATE_MAX = 12;
 const rateBuckets = new Map();
+const RATE_CLEANUP_MS = 5 * 60 * 1000;
+
+const rateCleanupTimer = setInterval(() => {
+  const now = Date.now();
+  for (const [ip, bucket] of rateBuckets) {
+    if (now - bucket.startedAt >= RATE_WINDOW_MS) {
+      rateBuckets.delete(ip);
+    }
+  }
+}, RATE_CLEANUP_MS);
+
+rateCleanupTimer.unref?.();
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -347,6 +359,32 @@ app.use((err, _req, res, _next) => {
   return res.status(500).json({ error: "Error interno del servidor." });
 });
 
-app.listen(port, () => {
-  console.log(`DocuListo API escuchando en el puerto ${port}`);
-});
+let server = null;
+
+export { app };
+
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(port, () => {
+    console.log(`DocuListo API escuchando en el puerto ${port}`);
+  });
+}
+
+function closeServer(signal) {
+  console.log(`DocuListo API recibiendo ${signal}; cerrando...`);
+
+  const finish = () => {
+    clearInterval(rateCleanupTimer);
+    process.exit(0);
+  };
+
+  if (!server) return finish();
+
+  server.close(() => finish());
+  setTimeout(() => {
+    clearInterval(rateCleanupTimer);
+    process.exit(1);
+  }, 10000).unref?.();
+}
+
+process.once("SIGTERM", () => closeServer("SIGTERM"));
+process.once("SIGINT", () => closeServer("SIGINT"));

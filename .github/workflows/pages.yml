@@ -24,6 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare guide SEO metadata
+        run: python3 scripts/prepare-seo.py
+
       - name: Generate sitemap automatically
         run: python3 scripts/generate-sitemap.py
 

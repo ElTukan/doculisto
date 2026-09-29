@@ -1,27 +1,32 @@
 # DocuListo API
 
-Backend inicial para analizar documentos con Gemini.
+Backend Express desplegado actualmente en Render.
 
-## Endpoints
+## Requisitos
+- Node.js 22+
+- `GEMINI_API_KEY`
 
-- GET /health
-- POST /api/analyze
-  - multipart/form-data
-  - campo: document
-  - PDF, JPG o PNG
-  - máximo 10 MB
-
-## Variable de entorno
-
-`GEMINI_API_KEY`
-
-Nunca la guardes en GitHub ni la pongas en el frontend.
-
-## Desarrollo
+## Desarrollo local
 
 ```bash
+cd backend
 npm install
-GEMINI_API_KEY="..." npm start
+npm test
+npm start
 ```
 
-El backend está preparado para ejecutarse detrás de un servicio como Railway.
+API local: `http://localhost:3000`
+
+## Endpoints
+- `GET /health` — health check.
+- `GET /api/diagnostic` — comprueba la configuración de Gemini.
+- `POST /api/analyze` — recibe un campo multipart `document` (PDF/JPG/PNG, máximo 10 MB).
+
+## Seguridad
+- La clave Gemini solo existe en el backend.
+- Los archivos se procesan en memoria y no se guardan en disco.
+- Hay límites de tamaño, rate limiting y headers HTTP de seguridad.
+- No subir documentos especialmente sensibles hasta disponer de la política de privacidad y tratamiento de datos definitiva.
+
+## Despliegue
+Render usa `render.yaml`, con `rootDir: backend` y `npm start`. El backend no utiliza Railway actualmente.

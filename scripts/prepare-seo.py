@@ -92,7 +92,8 @@ for path in sorted(GUIDES.glob("*.html")):
     text = re.sub(r'\n?\s*<link\s+rel=["\']canonical["\'][^>]*>', '', text, flags=re.I)
     text = re.sub(r'\n?\s*<meta\s+name=["\']robots["\'][^>]*>', '', text, flags=re.I)
     text = re.sub(r'\n?\s*<script\s+type=["\']application/ld\+json["\']>.*?</script>', '', text, flags=re.I | re.S)
-    text = re.sub(r'<script[^>]+googletagmanager\.com/gtag/js[^>]*></script>', '', text, flags=re.I)
+    text = re.sub(r'<script[^>]+googletagmanager\\.com/gtag/js[^>]*></script>', '', text, flags=re.I)
+    text = re.sub(r'<link\\s+rel=["\\'](?:shortcut )?icon["\\'][^>]+href=["\\'][^"\\']*favicon\\.svg[^"\\']*["\\'][^>]*>', '<link rel="icon" type="image/svg+xml" href="../favicon-doculisto.svg">', text, flags=re.I)
     text = re.sub(r'<script>.*?(?:G-ZTCN2SMVB7|G-ZC7K8J3BSVS).*?</script>', '', text, flags=re.I | re.S)
 
     if '<ins class="adsbygoogle"' not in text:

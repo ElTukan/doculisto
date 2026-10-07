@@ -1,0 +1,19 @@
+{
+  "name": "DocuListo — Entiende tus documentos",
+  "short_name": "DocuListo",
+  "description": "Sube tu documento y te explicamos qué significa, qué tienes que hacer y qué fechas revisar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/favicon-doculisto.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

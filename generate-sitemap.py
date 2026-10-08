@@ -9,7 +9,7 @@ import re
 import subprocess
 from xml.sax.saxutils import escape
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[0]
 SITE = "https://doculisto.es"
 CANONICAL_RE = re.compile(
     r'<link\s+rel=["\']canonical["\']\s+href=["\']([^"\']+)["\']',

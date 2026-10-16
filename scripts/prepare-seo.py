@@ -8,6 +8,7 @@ from datetime import date
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://doculisto.es"
+ADS_CLIENT = "ca-pub-2993676855543434"
 GUIDES = ROOT / "guias"
 
 def git_date(path, first=False):
@@ -96,8 +97,14 @@ for path in sorted(GUIDES.glob("*.html")):
     text = text.replace('href="../favicon.svg"', 'href="../favicon-doculisto.svg"')
     text = re.sub(r'<script>.*?(?:G-ZTCN2SMVB7|G-ZC7K8J3BSVS).*?</script>', '', text, flags=re.I | re.S)
 
-    if '<ins class="adsbygoogle"' not in text:
-        text = re.sub(r'<script[^>]+pagead2\.googlesyndication\.com/pagead/js/adsbygoogle\.js[^>]*></script>', '', text, flags=re.I)
+    # 2026-10-16: NO quitar el loader de AdSense. Con Auto Ads el script basta, y
+    # al eliminarlo las guias se quedaban sin anuncios (0 ingresos en esas paginas).
+    if "pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" not in text:
+        loader = (
+            '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
+            f'?client={ADS_CLIENT}" crossorigin="anonymous"></script>'
+        )
+        text = re.sub(r"(</head>)", loader + r"\1", text, count=1, flags=re.I)
 
     text = re.sub(r'<nav class="breadcrumbs"[^>]*>.*?</nav>', '', text, flags=re.I | re.S)
     text = re.sub(r'(</head>)', meta + r'\1', text, count=1, flags=re.I)

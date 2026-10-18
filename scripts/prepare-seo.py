@@ -40,6 +40,15 @@ for path in sorted(GUIDES.glob("*.html")):
     published = git_date(path, first=True)
     modified = git_date(path)
 
+    faq_schemas = []
+    for match in re.finditer(r'<script\s+type=["\']application/ld\+json["\']>(.*?)</script>', text, re.I | re.S):
+        try:
+            data = json.loads(match.group(1))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict) and data.get("@type") == "FAQPage":
+            faq_schemas.append(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+
     article_schema = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -80,6 +89,7 @@ for path in sorted(GUIDES.glob("*.html")):
         f'<script type="application/ld+json">{json.dumps(article_schema, ensure_ascii=False, separators=(",", ":"))}</script>'
         f'<script type="application/ld+json">{json.dumps(breadcrumb_schema, ensure_ascii=False, separators=(",", ":"))}</script>\n'
     )
+    meta += "".join(f'<script type="application/ld+json">{schema}</script>' for schema in faq_schemas)
 
     breadcrumb_html = (
         '<nav class="breadcrumbs" aria-label="Migas de pan">'

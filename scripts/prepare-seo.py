@@ -93,15 +93,16 @@ for path in sorted(GUIDES.glob("*.html")):
     text = re.sub(r'\n?\s*<meta\s+name=["\']robots["\'][^>]*>', '', text, flags=re.I)
     text = re.sub(r'\n?\s*<script\s+type=["\']application/ld\+json["\']>.*?</script>', '', text, flags=re.I | re.S)
     text = re.sub(r'<script[^>]+googletagmanager\.com/gtag/js[^>]*>\s*</script>', '', text, flags=re.I)
-    text = re.sub(r'<script[^>]+pagead2\.googlesyndication\.com[^>]*>\s*</script>', '', text, flags=re.I)
     text = text.replace('href="../favicon.svg"', 'href="../favicon-doculisto.svg"')
     text = re.sub(r'<script>.*?(?:G-ZTCN2SMVB7|G-ZC7K8J3BSVS).*?</script>', '', text, flags=re.I | re.S)
 
-    # Sin consentimiento no se carga nada de terceros: consent.js inyecta
-    # AdSense y Analytics solo cuando la persona acepta. Aqui solo aseguramos
-    # que cada guia enlaza consent.js antes de </head>, sin duplicarlo.
+    # AdSense va como etiqueta estatica en el HTML para que Google la vea
+    # aunque no se acepten cookies. consent.js aplica Consent Mode (denied por
+    # defecto) y Analytics solo se carga tras aceptar. Sin duplicados.
+    adsense_tag = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2993676855543434" crossorigin="anonymous"></script>'
     text = re.sub(r'[ \t]*<script[^>]+src=["\'][^"\']*consent\.js["\'][^>]*>\s*</script>\s*', '', text, flags=re.I)
-    text = re.sub(r"(</head>)", '<script src="../consent.js"></script>\\1', text, count=1, flags=re.I)
+    text = re.sub(r'[ \t]*<script[^>]+pagead2\.googlesyndication\.com/pagead/js/adsbygoogle\.js[^>]*>\s*</script>\s*', '', text, flags=re.I)
+    text = re.sub(r'(</head>)', '<script src="../consent.js"></script>' + adsense_tag + r'\1', text, count=1, flags=re.I)
 
     text = re.sub(r'<nav class="breadcrumbs"[^>]*>.*?</nav>', '', text, flags=re.I | re.S)
     text = re.sub(r'(</head>)', meta + r'\1', text, count=1, flags=re.I)

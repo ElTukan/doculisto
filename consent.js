@@ -1,13 +1,13 @@
 /* DocuListo - consentimiento de cookies.
    Sin dependencias. Guarda la decision en cookie y localStorage durante 1 ano.
-   AdSense y Google Analytics solo se cargan tras aceptar. */
+   AdSense se carga siempre desde el HTML (etiqueta estatica) con Consent Mode:
+   por defecto denegado. Google Analytics solo se carga tras aceptar. */
 (function () {
   "use strict";
 
   var COOKIE_NAME = "doculisto_consent";
   var LEGACY_KEY = "doculisto_analytics_consent";
   var COOKIE_AGE = 31536000; // 1 ano
-  var ADSENSE_SRC = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2993676855543434";
   var GTAG_SRC = "https://www.googletagmanager.com/gtag/js?id=G-ZTCN2SMVB7";
   var GA_ID = "G-ZTCN2SMVB7";
 
@@ -125,7 +125,6 @@
       allow_ad_personalization_signals: true
     });
     loadScript(GTAG_SRC, "data-doculisto-gtag");
-    loadScript(ADSENSE_SRC, "data-doculisto-adsense", true);
   }
 
   function buildBanner() {
@@ -148,7 +147,7 @@
 
     document.getElementById("acceptConsent").addEventListener("click", function () {
       saveDecision("accepted");
-      grant();
+      grant(); // Consent Mode: actualiza a granted sin recargar.
       banner.hidden = true;
     });
 
@@ -160,10 +159,9 @@
 
   var decision = readDecision();
 
-  // Consent Mode: por defecto denegado mientras no haya una decision guardada.
-  if (decision !== "accepted") {
-    setConsent("default");
-  } else {
+  // Consent Mode: siempre denegado por defecto; si ya acepto, actualizamos.
+  setConsent("default");
+  if (decision === "accepted") {
     grant();
   }
 

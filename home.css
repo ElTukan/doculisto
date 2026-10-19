@@ -1,0 +1,154 @@
+/* DocuListo — portada editorial (2026-10) */
+body.home{
+  background-image:
+    linear-gradient(180deg, rgba(63,58,201,.045), transparent 420px),
+    repeating-linear-gradient(0deg, rgba(11,18,32,.028) 0 1px, transparent 1px 96px);
+  background-color:var(--bg);
+}
+
+.home .site-header{background:rgba(251,250,246,.85);border-color:var(--line)}
+
+.home main{padding-top:8px}
+
+/* HERO */
+.home .hero{
+  display:grid;grid-template-columns:1.08fr .92fr;gap:64px;align-items:center;
+  width:min(1180px,calc(100% - 48px));margin:0 auto;padding:76px 0 64px;
+}
+.home .hero-copy .eyebrow{
+  display:inline-flex;align-items:center;gap:9px;padding:7px 13px;border:1px solid var(--line);
+  border-radius:999px;background:rgba(255,255,255,.7);margin-bottom:26px;
+}
+.home .hero-copy h1{
+  font-family:var(--font-display);font-weight:600;
+  font-size:clamp(2.8rem,6vw,5rem);line-height:.98;letter-spacing:-.038em;margin:0 0 22px;color:var(--text);
+}
+.home .hero-copy h1 span{
+  display:block;font-style:italic;font-weight:500;color:var(--accent);letter-spacing:-.028em;
+}
+.home .hero-text{font-size:19px;line-height:1.6;color:var(--text-secondary);max-width:46ch;margin:0 0 26px}
+.home .hero-points{display:flex;gap:10px;flex-wrap:wrap;margin:0}
+.home .hero-points span{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;
+}
+
+/* TARJETA: hoja de expediente */
+.home .upload-card{
+  position:relative;background:#fff;border:1px solid var(--line);border-radius:6px;
+  padding:28px;box-shadow:0 30px 70px -34px rgba(11,18,32,.45), 0 2px 0 rgba(11,18,32,.04);
+}
+.home .upload-card::before{
+  content:"";position:absolute;inset:10px -10px -10px 10px;border:1px solid var(--line);
+  border-radius:6px;background:#F4F1E9;z-index:-1;transform:rotate(-1.2deg);
+}
+.home .upload-card::after{
+  content:"EXPEDIENTE";position:absolute;top:18px;right:-14px;transform:rotate(6deg);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;color:var(--accent);
+  border:1.5px solid var(--accent);border-radius:3px;padding:4px 8px;opacity:.75;background:rgba(251,250,246,.8);
+}
+.home .upload-card-top{margin-bottom:20px}
+.home .card-kicker{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#8A8172;margin:0 0 6px}
+.home .upload-card h2{font-family:var(--font-display);font-size:1.6rem;font-weight:600;letter-spacing:-.02em;margin:0}
+.home .lock-pill{font-family:var(--font-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-light);border:1px solid var(--accent-border);border-radius:999px;padding:6px 10px}
+.home .dropzone{
+  border:1.5px dashed var(--line-strong);border-radius:6px;background:#FBFAF6;
+  padding:34px 22px;text-align:center;transition:.2s;cursor:pointer;
+}
+.home .dropzone:hover,.home .dropzone:focus-visible{border-color:var(--accent);background:#F7F6FF}
+.home .dropzone strong{display:block;font-family:var(--font-display);font-size:1.15rem;font-weight:600;margin-top:8px;color:var(--text)}
+.home .dropzone span{display:block;font-size:13.5px;color:var(--muted);margin-top:4px}
+.home .dropzone small{display:block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;color:var(--muted-light);margin-top:12px}
+.home .select-file-button{
+  margin-top:16px;background:var(--text);color:#FBFAF6;border:0;border-radius:999px;
+  padding:11px 20px;font-weight:600;font-size:13.5px;cursor:pointer;
+}
+
+/* BANDA DE CONFIANZA */
+.home .trust-strip{
+  width:min(1180px,calc(100% - 48px));margin:0 auto;padding:26px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+}
+.home .trust-strip > *{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary)}
+
+/* SECCIONES */
+.home .section{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:84px 0}
+.home .section-label{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;
+}
+.home .section-label::after{content:"";flex:1;height:1px;background:var(--line)}
+.home .section-heading h2{
+  font-family:var(--font-display);font-size:clamp(2rem,3.6vw,3rem);line-height:1.04;
+  letter-spacing:-.03em;margin:0 0 14px;
+}
+.home .section-heading > p{font-size:17px;color:var(--muted);max-width:62ch}
+
+/* PASOS */
+.home .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:44px;border-top:1px solid var(--line)}
+.home .step-card{
+  border:0;border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+  border-radius:0;background:transparent;padding:32px 28px 36px 0;box-shadow:none;
+}
+.home .step-card:last-child{border-right:0}
+.home .step-card:hover{transform:none;box-shadow:none;background:rgba(63,58,201,.03)}
+.home .step-number{
+  display:block;font-family:var(--font-display);font-size:2.2rem;font-weight:600;color:var(--accent);
+  letter-spacing:-.03em;margin-bottom:14px;
+}
+.home .step-card h3{font-family:var(--font-display);font-size:1.28rem;margin:0 0 8px}
+.home .step-card p{font-size:15px;color:var(--muted);margin:0}
+
+/* GUÍAS: índice editorial */
+.home #guias .article-card{
+  display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:18px;
+  background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;
+  padding:24px 4px;box-shadow:none;counter-increment:guia;
+}
+.home #guias{counter-reset:guia}
+.home #guias .article-card::before{
+  content:counter(guia,decimal-leading-zero);font-family:var(--font-mono);font-size:11px;
+  letter-spacing:.12em;color:#8A8172;
+}
+.home #guias .article-card h3{
+  font-family:var(--font-display);font-size:1.35rem;font-weight:600;letter-spacing:-.02em;margin:0;
+  transition:color .2s;
+}
+.home #guias .article-card:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.home #guias .article-card:hover h3{color:var(--accent)}
+.home #guias .article-card .text-link{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;
+}
+.home #guias .article-card:hover .text-link{color:var(--accent)}
+
+/* CALLOUT */
+.home .callout{
+  width:min(1180px,calc(100% - 48px));margin:0 auto;padding:56px;
+  background:var(--text);color:#FBFAF6;border-radius:4px;
+}
+.home .callout h2,.home .callout p,.home .callout a{color:#FBFAF6}
+.home .callout h2{font-family:var(--font-display);font-size:clamp(1.8rem,3.2vw,2.6rem);letter-spacing:-.03em;line-height:1.05}
+
+/* FAQ */
+.home .faq details{border-top:1px solid var(--line);padding:20px 0}
+.home .faq summary{font-family:var(--font-display);font-size:1.12rem;font-weight:600}
+.home .faq p{color:var(--muted);font-size:15.5px}
+
+/* PIE */
+.home .site-footer{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:56px 0 70px;border-top:1px solid var(--line)}
+
+@media(max-width:980px){
+  .home .hero{grid-template-columns:1fr;gap:44px;padding:48px 0 40px}
+  .home .hero-copy h1{font-size:clamp(2.4rem,10vw,3.4rem)}
+  .home .upload-card::before{display:none}
+  .home .upload-card::after{right:10px;top:-10px}
+  .home .trust-strip{grid-template-columns:1fr;gap:14px}
+  .home .steps-grid{grid-template-columns:1fr}
+  .home .step-card{border-right:0;padding:26px 0}
+  .home #guias .article-card{grid-template-columns:40px 1fr;gap:14px}
+  .home #guias .article-card .text-link{grid-column:2;margin-top:6px}
+  .home .callout{padding:32px 24px}
+  .home .section{padding:60px 0}
+}

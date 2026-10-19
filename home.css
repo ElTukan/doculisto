@@ -101,27 +101,28 @@ body.home{
 .home .step-card p{font-size:15px;color:var(--muted);margin:0}
 
 /* GUÍAS: índice editorial */
-.home #guias .article-card{
-  display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:18px;
-  background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;
-  padding:24px 4px;box-shadow:none;counter-increment:guia;
-}
+.home #guias .article-grid{display:block}
 .home #guias{counter-reset:guia}
+.home #guias .article-card{
+  display:grid;grid-template-columns:54px 1fr;column-gap:18px;row-gap:5px;align-items:start;
+  background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;
+  padding:22px 2px;box-shadow:none;counter-increment:guia;text-decoration:none;
+}
 .home #guias .article-card::before{
-  content:counter(guia,decimal-leading-zero);font-family:var(--font-mono);font-size:11px;
-  letter-spacing:.12em;color:#8A8172;
+  content:counter(guia,decimal-leading-zero);grid-row:1 / span 3;grid-column:1;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;color:#8A8172;padding-top:4px;
 }
-.home #guias .article-card h3{
-  font-family:var(--font-display);font-size:1.35rem;font-weight:600;letter-spacing:-.02em;margin:0;
-  transition:color .2s;
+.home #guias .article-card > span{
+  grid-column:2;font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);
 }
-.home #guias .article-card:hover{transform:none;box-shadow:none;border-color:var(--line)}
-.home #guias .article-card:hover h3{color:var(--accent)}
-.home #guias .article-card .text-link{
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);white-space:nowrap;
+.home #guias .article-card > h2{
+  grid-column:2;font-family:var(--font-display);font-size:1.32rem;font-weight:600;
+  letter-spacing:-.02em;line-height:1.2;margin:0;color:var(--text);transition:color .2s;
 }
-.home #guias .article-card:hover .text-link{color:var(--accent)}
+.home #guias .article-card > p{grid-column:2;margin:2px 0 0;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.home #guias .article-card:hover{transform:none;box-shadow:none;background:rgba(63,58,201,.025)}
+.home #guias .article-card:hover > h2{color:var(--accent)}
 
 /* CALLOUT */
 .home .callout{
@@ -230,3 +231,10 @@ body.home{
   .home .callout h2{font-size:1.4rem}
 }
 
+
+@media (max-width:720px){
+  .home #guias .article-card{grid-template-columns:34px 1fr;column-gap:12px;padding:17px 0;row-gap:3px}
+  .home #guias .article-card > h2{font-size:1.12rem}
+  .home #guias .article-card > p{font-size:13.5px}
+  .home #guias .article-card > span{font-size:8.5px}
+}

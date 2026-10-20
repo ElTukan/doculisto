@@ -505,8 +505,8 @@ button {
 }
 
 .remove-file {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 0;
   background: transparent;
@@ -530,6 +530,9 @@ button {
   align-items: flex-start;
   gap: 10px;
   margin-top: 16px;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border-radius: var(--radius-md);
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
@@ -539,8 +542,9 @@ button {
 
 .age-check input {
   margin: 2px 0 0;
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
   accent-color: var(--accent);
   border-radius: 4px;
   cursor: pointer;
@@ -1670,6 +1674,98 @@ details p {
 .text-link:hover {
   color: #4338ca;
   border-bottom-color: #4338ca;
+}
+
+/* ==========================================================================
+   ESCENA DE EXITO (markup generado por app-v2.js)
+   ========================================================================== */
+.success-scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin: 4px auto 18px;
+}
+
+.success-check {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: var(--shadow-glow);
+  animation: successPop 0.45s var(--ease) both;
+}
+
+.success-ring {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-full);
+  opacity: 0;
+  animation: successRing 1.8s var(--ease) 0.15s both;
+}
+
+.success-ring-two {
+  animation-delay: 0.5s;
+}
+
+.success-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  opacity: 0;
+  animation: successParticle 0.9s var(--ease) 0.2s both;
+}
+
+.particle-one { --tx: -34px; --ty: -26px; }
+.particle-two { --tx: 30px; --ty: -30px; }
+.particle-three { --tx: 38px; --ty: 6px; }
+.particle-four { --tx: 18px; --ty: 32px; }
+.particle-five { --tx: -24px; --ty: 30px; }
+.particle-six { --tx: -40px; --ty: 6px; }
+
+.success-content {
+  animation: fadeIn 0.35s var(--ease) 0.1s both;
+}
+
+@keyframes successPop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes successRing {
+  0% { opacity: 0.55; transform: scale(0.7); }
+  70% { opacity: 0.15; }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+@keyframes successParticle {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-check,
+  .success-ring,
+  .success-particle,
+  .success-content {
+    animation: none;
+  }
+  .success-particle { opacity: 0; }
 }
 
 /* ==========================================================================
